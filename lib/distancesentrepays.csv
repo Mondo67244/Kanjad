@@ -1,0 +1,276 @@
+pays,ville_1,ville_2,distance_km
+Allemagne,Berlin,Cologne,477.3
+Allemagne,Berlin,Francfort,423.5
+Allemagne,Berlin,Hambourg,255.3
+Allemagne,Berlin,Munich,504.4
+Allemagne,Cologne,Francfort,152.5
+Allemagne,Hambourg,Cologne,356.5
+Allemagne,Hambourg,Francfort,393.0
+Allemagne,Hambourg,Munich,612.4
+Allemagne,Munich,Cologne,456.3
+Allemagne,Munich,Francfort,304.6
+Belgique,Anvers,Charleroi,89.9
+Belgique,Anvers,Gand,51.2
+Belgique,Anvers,Liège,105.2
+Belgique,Bruxelles,Anvers,41.2
+Belgique,Bruxelles,Charleroi,49.2
+Belgique,Bruxelles,Gand,49.9
+Belgique,Bruxelles,Liège,89.7
+Belgique,Charleroi,Liège,83.9
+Belgique,Gand,Charleroi,87.9
+Belgique,Gand,Liège,138.9
+Cameroun,Bafoussam,Bamenda,60.9
+Cameroun,Bafoussam,Bertoua,375.5
+Cameroun,Bafoussam,Ebolowa,298.1
+Cameroun,Bafoussam,Kribi,287.3
+Cameroun,Bafoussam,Ngaoundéré,405.8
+Cameroun,Bamenda,Bertoua,419.6
+Cameroun,Bamenda,Ebolowa,357.9
+Cameroun,Bamenda,Kribi,336.7
+Cameroun,Bamenda,Ngaoundéré,407.4
+Cameroun,Bertoua,Ebolowa,337.7
+Cameroun,Bertoua,Kribi,456.1
+Cameroun,Douala,Bafoussam,174.3
+Cameroun,Douala,Bamenda,217.0
+Cameroun,Douala,Bertoua,438.1
+Cameroun,Douala,Ebolowa,199.6
+Cameroun,Douala,Garoua,708.1
+Cameroun,Douala,Kribi,124.1
+Cameroun,Douala,Maroua,883.8
+Cameroun,Douala,Ngaoundéré,557.6
+Cameroun,Douala,Yaoundé,193.7
+Cameroun,Ebolowa,Kribi,137.1
+Cameroun,Garoua,Bafoussam,537.3
+Cameroun,Garoua,Bamenda,514.9
+Cameroun,Garoua,Bertoua,526.2
+Cameroun,Garoua,Ebolowa,754.1
+Cameroun,Garoua,Kribi,804.9
+Cameroun,Garoua,Maroua,175.7
+Cameroun,Garoua,Ngaoundéré,220.2
+Cameroun,Maroua,Bafoussam,712.8
+Cameroun,Maroua,Bamenda,689.0
+Cameroun,Maroua,Bertoua,672.5
+Cameroun,Maroua,Ebolowa,924.4
+Cameroun,Maroua,Kribi,979.7
+Cameroun,Maroua,Ngaoundéré,371.8
+Cameroun,Ngaoundéré,Bertoua,306.2
+Cameroun,Ngaoundéré,Ebolowa,561.6
+Cameroun,Ngaoundéré,Kribi,634.6
+Cameroun,Yaoundé,Bafoussam,217.6
+Cameroun,Yaoundé,Bamenda,278.2
+Cameroun,Yaoundé,Bertoua,255.1
+Cameroun,Yaoundé,Ebolowa,112.7
+Cameroun,Yaoundé,Garoua,641.4
+Cameroun,Yaoundé,Kribi,203.0
+Cameroun,Yaoundé,Maroua,811.8
+Cameroun,Yaoundé,Ngaoundéré,450.3
+Canada,Calgary,Edmonton,280.9
+Canada,Calgary,Hamilton,2699.1
+Canada,Calgary,Mississauga,2696.2
+Canada,Calgary,Ottawa,2875.6
+Canada,Calgary,Québec,3121.2
+Canada,Calgary,Winnipeg,1202.6
+Canada,Edmonton,Hamilton,2700.3
+Canada,Edmonton,Mississauga,2692.9
+Canada,Edmonton,Ottawa,2837.3
+Canada,Edmonton,Québec,3053.9
+Canada,Edmonton,Winnipeg,1194.3
+Canada,Mississauga,Hamilton,41.3
+Canada,Mississauga,Québec,751.4
+Canada,Mississauga,Winnipeg,1501.2
+Canada,Montréal,Calgary,3020.2
+Canada,Montréal,Edmonton,2973.1
+Canada,Montréal,Hamilton,559.6
+Canada,Montréal,Mississauga,526.3
+Canada,Montréal,Ottawa,166.3
+Canada,Montréal,Québec,233.0
+Canada,Montréal,Vancouver,3686.3
+Canada,Montréal,Winnipeg,1821.9
+Canada,Ottawa,Hamilton,410.0
+Canada,Ottawa,Mississauga,373.4
+Canada,Ottawa,Québec,379.0
+Canada,Ottawa,Winnipeg,1674.4
+Canada,Québec,Hamilton,786.7
+Canada,Toronto,Calgary,2710.8
+Canada,Toronto,Edmonton,2705.7
+Canada,Toronto,Hamilton,59.2
+Canada,Toronto,Mississauga,22.2
+Canada,Toronto,Montréal,504.3
+Canada,Toronto,Ottawa,352.1
+Canada,Toronto,Québec,729.8
+Canada,Toronto,Vancouver,3358.9
+Canada,Toronto,Winnipeg,1514.7
+Canada,Vancouver,Calgary,673.2
+Canada,Vancouver,Edmonton,817.7
+Canada,Vancouver,Hamilton,3343.5
+Canada,Vancouver,Mississauga,3343.3
+Canada,Vancouver,Ottawa,3539.0
+Canada,Vancouver,Québec,3792.1
+Canada,Vancouver,Winnipeg,1864.7
+Canada,Winnipeg,Hamilton,1507.2
+Canada,Winnipeg,Québec,1936.3
+Côte d'Ivoire,Abidjan,Bouaké,283.3
+Côte d'Ivoire,Abidjan,Daloa,319.1
+Côte d'Ivoire,Abidjan,San-Pédro,297.4
+Côte d'Ivoire,Abidjan,Yamoussoukro,216.2
+Côte d'Ivoire,Bouaké,Daloa,182.0
+Côte d'Ivoire,Bouaké,San-Pédro,373.3
+Côte d'Ivoire,Bouaké,Yamoussoukro,100.7
+Côte d'Ivoire,Daloa,San-Pédro,239.0
+Côte d'Ivoire,Daloa,Yamoussoukro,129.1
+Côte d'Ivoire,Yamoussoukro,San-Pédro,275.4
+France,Bordeaux,Lille,698.8
+France,Lyon,Bordeaux,435.8
+France,Lyon,Lille,556.8
+France,Lyon,Montpellier,251.0
+France,Lyon,Nantes,515.0
+France,Lyon,Nice,298.1
+France,Lyon,Strasbourg,382.3
+France,Lyon,Toulouse,359.9
+France,Marseille,Bordeaux,505.1
+France,Marseille,Lille,833.9
+France,Marseille,Lyon,277.6
+France,Marseille,Montpellier,125.5
+France,Marseille,Nantes,695.1
+France,Marseille,Nice,159.4
+France,Marseille,Strasbourg,614.9
+France,Marseille,Toulouse,318.7
+France,Montpellier,Bordeaux,380.3
+France,Montpellier,Lille,782.7
+France,Nantes,Bordeaux,275.2
+France,Nantes,Lille,507.1
+France,Nantes,Montpellier,583.3
+France,Nantes,Strasbourg,709.5
+France,Nice,Bordeaux,636.5
+France,Nice,Lille,832.1
+France,Nice,Montpellier,272.5
+France,Nice,Nantes,789.8
+France,Nice,Strasbourg,542.1
+France,Paris,Bordeaux,499.3
+France,Paris,Lille,203.5
+France,Paris,Lyon,391.5
+France,Paris,Marseille,660.5
+France,Paris,Montpellier,594.8
+France,Paris,Nantes,342.7
+France,Paris,Nice,685.1
+France,Paris,Strasbourg,397.3
+France,Paris,Toulouse,588.1
+France,Strasbourg,Bordeaux,758.4
+France,Strasbourg,Lille,408.2
+France,Strasbourg,Montpellier,627.2
+France,Toulouse,Bordeaux,211.6
+France,Toulouse,Lille,790.5
+France,Toulouse,Montpellier,195.9
+France,Toulouse,Nantes,464.9
+France,Toulouse,Nice,468.1
+France,Toulouse,Strasbourg,735.6
+Nigeria,Aba,Jos,557.5
+Nigeria,Abuja,Aba,441.5
+Nigeria,Abuja,Benin City,361.8
+Nigeria,Abuja,Jos,184.2
+Nigeria,Abuja,Maiduguri,699.6
+Nigeria,Abuja,Port Harcourt,475.4
+Nigeria,Abuja,Zaria,226.1
+Nigeria,Benin City,Aba,236.4
+Nigeria,Benin City,Jos,532.1
+Nigeria,Benin City,Maiduguri,1027.3
+Nigeria,Benin City,Zaria,575.8
+Nigeria,Ibadan,Aba,454.6
+Nigeria,Ibadan,Abuja,424.2
+Nigeria,Ibadan,Benin City,218.4
+Nigeria,Ibadan,Jos,608.2
+Nigeria,Ibadan,Maiduguri,1123.8
+Nigeria,Ibadan,Port Harcourt,445.9
+Nigeria,Ibadan,Zaria,584.3
+Nigeria,Kano,Aba,778.5
+Nigeria,Kano,Abuja,350.5
+Nigeria,Kano,Benin City,708.9
+Nigeria,Kano,Ibadan,723.5
+Nigeria,Kano,Jos,235.9
+Nigeria,Kano,Maiduguri,496.3
+Nigeria,Kano,Port Harcourt,816.9
+Nigeria,Kano,Zaria,139.4
+Nigeria,Lagos,Aba,468.4
+Nigeria,Lagos,Abuja,525.9
+Nigeria,Lagos,Benin City,249.1
+Nigeria,Lagos,Ibadan,113.7
+Nigeria,Lagos,Jos,710.0
+Nigeria,Lagos,Kano,835.5
+Nigeria,Lagos,Maiduguri,1223.9
+Nigeria,Lagos,Port Harcourt,448.4
+Nigeria,Lagos,Zaria,696.1
+Nigeria,Maiduguri,Aba,981.6
+Nigeria,Maiduguri,Jos,515.7
+Nigeria,Maiduguri,Zaria,597.6
+Nigeria,Port Harcourt,Aba,47.7
+Nigeria,Port Harcourt,Benin City,231.3
+Nigeria,Port Harcourt,Jos,599.1
+Nigeria,Port Harcourt,Maiduguri,1029.0
+Nigeria,Port Harcourt,Zaria,701.0
+Nigeria,Zaria,Aba,665.9
+Nigeria,Zaria,Jos,181.5
+Suisse,Bâle,Berne,68.8
+Suisse,Bâle,Lausanne,136.5
+Suisse,Genève,Berne,129.5
+Suisse,Genève,Bâle,186.5
+Suisse,Genève,Lausanne,51.4
+Suisse,Lausanne,Berne,78.3
+Suisse,Zurich,Berne,95.5
+Suisse,Zurich,Bâle,74.5
+Suisse,Zurich,Genève,224.4
+Suisse,Zurich,Lausanne,173.5
+Sénégal,Dakar,Kaolack,160.1
+Sénégal,Dakar,Rufisque,17.0
+Sénégal,Dakar,Thiès,55.7
+Sénégal,Dakar,Touba,165.6
+Sénégal,Rufisque,Kaolack,145.7
+Sénégal,Thiès,Kaolack,117.6
+Sénégal,Thiès,Rufisque,38.7
+Sénégal,Touba,Kaolack,81.7
+Sénégal,Touba,Rufisque,148.7
+Sénégal,Touba,Thiès,110.2
+États-Unis,Chicago,Dallas,1295.0
+États-Unis,Chicago,Houston,1515.8
+États-Unis,Chicago,Philadelphie,1068.0
+États-Unis,Chicago,Phoenix,2336.3
+États-Unis,Chicago,San Antonio,1694.3
+États-Unis,Chicago,San Diego,2786.7
+États-Unis,Chicago,San José,2957.6
+États-Unis,Dallas,San José,2331.9
+États-Unis,Houston,Dallas,361.8
+États-Unis,Houston,Philadelphie,2156.3
+États-Unis,Houston,Phoenix,1632.2
+États-Unis,Houston,San Antonio,304.3
+États-Unis,Houston,San Diego,2093.9
+États-Unis,Houston,San José,2587.4
+États-Unis,Los Angeles,Chicago,2804.0
+États-Unis,Los Angeles,Dallas,1992.0
+États-Unis,Los Angeles,Houston,2206.3
+États-Unis,Los Angeles,Philadelphie,3843.5
+États-Unis,Los Angeles,Phoenix,574.3
+États-Unis,Los Angeles,San Antonio,1933.8
+États-Unis,Los Angeles,San Diego,179.4
+États-Unis,Los Angeles,San José,491.6
+États-Unis,New York,Chicago,1144.3
+États-Unis,New York,Dallas,2205.7
+États-Unis,New York,Houston,2281.3
+États-Unis,New York,Los Angeles,3935.8
+États-Unis,New York,Philadelphie,129.6
+États-Unis,New York,Phoenix,3443.7
+États-Unis,New York,San Antonio,2545.0
+États-Unis,New York,San Diego,3907.2
+États-Unis,New York,San José,4101.9
+États-Unis,Philadelphie,Dallas,2088.0
+États-Unis,Philadelphie,San Antonio,2422.4
+États-Unis,Philadelphie,San Diego,3810.6
+États-Unis,Philadelphie,San José,4021.5
+États-Unis,Phoenix,Dallas,1423.5
+États-Unis,Phoenix,Philadelphie,3344.1
+États-Unis,Phoenix,San Antonio,1362.6
+États-Unis,Phoenix,San Diego,480.9
+États-Unis,Phoenix,San José,988.3
+États-Unis,San Antonio,Dallas,406.3
+États-Unis,San Antonio,San Diego,1812.7
+États-Unis,San Antonio,San José,2335.6
+États-Unis,San Diego,Dallas,1901.6
+États-Unis,San Diego,San José,670.1

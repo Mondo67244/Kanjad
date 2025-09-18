@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <base href="/">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="Kanjad - Votre boutique en ligne de confiance pour équipements informatiques et électroniques">
+  <meta name="keywords" content="boutique, ecommerce, informatique, électronique, kanjad, équipements">
+  <meta name="author" content="Kanjad">
+  <meta name="theme-color" content="#8D0D04">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:title" content="Kanjad - Boutique en ligne">
+  <meta property="og:description" content="Votre boutique en ligne de confiance pour équipements informatiques et électroniques">
+  <meta property="og:image" content="assets/assets/images/kanjad.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- PWA -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Kanjad">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <!-- Preload critical scripts -->
+  <link rel="preload" href="main.dart.js" as="script">
+  <link rel="preload" href="flutter_bootstrap.js" as="script">
+  <link rel="preload" href="flutter.js" as="script">
+
+  <!-- Paiement -->
+  <script src="https://cdn.cinetpay.com/seamless/main.js" defer></script>
+
+  <title>Kanjad</title>
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background-color: #8D0D04;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: sans-serif;
+    }
+
+    #logo {
+      width: 190px;
+      height: 85px;
+      margin-bottom: 20px;
+    }
+
+    #message {
+      color: white;
+      font-size: 16px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #flutter-container {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    #progress {
+      color: white;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <img id="logo" src="assets/assets/images/kanjad.png" alt="Logo Kanjad - Boutique en ligne">
+  <div id="message" role="status" aria-live="polite">
+    <strong>Chargement de Kanjad...</strong>
+    <div id="progress">0%</div>
+  </div>
+
+  <div id="flutter-container"></div>
+
+  <noscript>
+    <p style="color:white; text-align:center;">
+      ⚠️ JavaScript est requis pour utiliser l’application Kanjad.
+    </p>
+  </noscript>
+
+  <script>
+    let currentVersion = null;
+    const assetsToPreload = [
+      'main.dart.js',
+      'flutter.js',
+      'flutter_bootstrap.js',
+      'assets/assets/images/kanjad.png'
+    ];
+    let loadedCount = 0;
+
+    async function checkForUpdate() {
+      try {
+        const res = await fetch('version.json?cacheBust=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) return;
+        const remoteVersion = await res.text();
+
+        if (currentVersion === null) {
+          currentVersion = remoteVersion;
+          localStorage.setItem('app_version', remoteVersion);
+        } else if (remoteVersion !== currentVersion) {
+          showUpdateBanner();
+          localStorage.setItem('app_version', remoteVersion);
+        }
+      } catch (e) {
+        console.warn("Impossible de vérifier la version:", e);
+      }
+    }
+
+    function showUpdateBanner() {
+      if (document.getElementById("update-banner")) return;
+
+      const banner = document.createElement("div");
+      banner.id = "update-banner";
+      banner.setAttribute("role", "alert");
+      banner.innerHTML = `
+        🚀 Nouvelle version disponible – <button id="reload-btn">Recharger</button>
+      `;
+      Object.assign(banner.style, {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        width: "100%",
+        backgroundColor: "#222",
+        color: "#fff",
+        textAlign: "center",
+        padding: "10px",
+        zIndex: "9999",
+        fontFamily: "sans-serif",
+      });
+
+      document.body.appendChild(banner);
+
+      document.getElementById("reload-btn").onclick = () => {
+        location.reload(true);
+      };
+    }
+
+    function updateProgress() {
+      const percent = Math.round((loadedCount / assetsToPreload.length) * 100);
+      document.getElementById('progress').textContent = `${percent}%`;
+    }
+
+    function startFlutter() {
+      const script = document.createElement('script');
+      script.src = 'flutter_bootstrap.js';
+      script.async = true;
+      script.onload = () => {
+        document.getElementById('logo').style.display = 'none';
+        document.getElementById('message').style.display = 'none';
+        document.getElementById('flutter-container').style.display = 'block';
+      };
+      document.body.appendChild(script);
+
+      setInterval(checkForUpdate, 30000);
+    }
+
+    function fileLoaded() {
+      loadedCount++;
+      updateProgress();
+      if (loadedCount === assetsToPreload.length) {
+        startFlutter();
+      }
+    }
+
+    assetsToPreload.forEach(path => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', path, true);
+      xhr.responseType = 'blob';
+      xhr.onload = fileLoaded;
+      xhr.onerror = () => {
+        console.warn(`Erreur de préchargement pour ${path}`);
+        fileLoaded(); // on compte quand même
+      };
+      xhr.send();
+    });
+
+    checkForUpdate();
+  </script>
+</body>
+
+</html>
