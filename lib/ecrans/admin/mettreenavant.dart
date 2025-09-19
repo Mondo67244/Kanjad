@@ -292,7 +292,7 @@ class _MettreEnAvantState extends State<MettreEnAvant> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AspectRatio(
-            aspectRatio: 14 / 10,
+            aspectRatio: 15 / 9,
             child: KanjadImage(
               imageData: produit.img1,
               sousCategorie: produit.souscategorie,
@@ -308,15 +308,9 @@ class _MettreEnAvantState extends State<MettreEnAvant> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              'Vues: ${produit.vues}',
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-            ),
-          ),
+          
           SwitchListTile(
-            title: const Text('En avant', style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold)),
+            title: const Text('Favori', style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold)),
             value: isHighlighted,
             onChanged: (value) => _toggleHighlight(produit, value),
             activeThumbColor: Styles.vert,

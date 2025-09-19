@@ -80,7 +80,7 @@ class SupabaseService {
       case 'appareil mobile':
         return 'imageappareilmobile';
       default:
-        return 'imagesproduits'; // A default bucket
+        return 'imagesproduits'; 
     }
   }
 
@@ -512,7 +512,7 @@ class SupabaseService {
       );
       final response = await supabase.from('commandes').select('''*,
       client:utilisateurs!commandes_idutilisateur_fkey(*),
-      livreur:utilisateurs!commandes_idlivreur_fkey(*),
+      livreur:utilisateurs!commandes_idlivreur_fkey(*)
       ''');
       developer.log(
         'Successfully fetched ${response.length} commandes',
