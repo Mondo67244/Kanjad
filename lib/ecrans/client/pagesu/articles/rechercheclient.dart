@@ -189,6 +189,15 @@ class _ResultatsState extends State<Resultats> with TickerProviderStateMixin {
   _SearchMode _currentSearchMode = _SearchMode.ByFilters;
   Timer? _debounce;
 
+  // Pagination progressive
+  final ScrollController _scrollController = ScrollController();
+  static const int _batchSize = 20;
+  int _currentBatch = 1;
+  List<Produit> _allFilteredProducts = [];
+  List<Produit> _displayedProducts = [];
+  bool _isLoadingMore = false;
+  bool _hasMoreProducts = true;
+
   @override
   void initState() {
     super.initState();
@@ -196,6 +205,9 @@ class _ResultatsState extends State<Resultats> with TickerProviderStateMixin {
     _searchController.addListener(_onFilterChanged);
     _minPriceController.addListener(_onFilterChanged);
     _maxPriceController.addListener(_onFilterChanged);
+
+    // Initialiser le listener pour la pagination infinie
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -1030,6 +1042,14 @@ class _ResultatsState extends State<Resultats> with TickerProviderStateMixin {
       return const LoadingIndicator();
     }
 
+    // Mettre à jour les produits filtrés si nécessaire
+    if (_allFilteredProducts.length != _filteredProduits.length ||
+        !_areListsEqual(_allFilteredProducts, _filteredProduits)) {
+      _allFilteredProducts = List.from(_filteredProduits);
+      _resetPagination();
+      _displayedProducts = _allFilteredProducts.take(_batchSize).toList();
+    }
+
     if (_filteredProduits.isEmpty) {
       return Center(
         child: Column(
@@ -1072,71 +1092,102 @@ class _ResultatsState extends State<Resultats> with TickerProviderStateMixin {
 
     return Container(
       color: Colors.white,
-      child:
-          isWideScreen
-              ? GridView.builder(
-                padding: const EdgeInsets.all(24),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 320,
-                  childAspectRatio: 1,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20,
-                ),
-                itemCount: _filteredProduits.length,
-                itemBuilder: (context, index) {
-                  final produit = _filteredProduits[index];
-                  final bool isPanier = panierProvider.isProduitInPanier(
-                    produit.idproduit,
-                  );
-                  return ProductCard(
-                    produit: produit,
-                    isPanier: isPanier,
-                    isWideScreen: false,
-                    onTogglePanier: () async {
-                      final result = await panierProvider.clicPanier(
-                        produit.idproduit,
-                      );
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(result['message']),
-                            backgroundColor:
-                                result['success']
-                                    ? Colors.green
-                                    : Styles.erreur,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                    onTap:
-                        () => Navigator.pushNamed(
-                          context,
-                          '/utilisateur/produit/details',
-                          arguments: produit,
+      child: Column(
+        children: [
+          Expanded(
+            child: isWideScreen
+                ? GridView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(24),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 320,
+                    childAspectRatio: 1,
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                  ),
+                  itemCount: _displayedProducts.length + (_hasMoreProducts ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == _displayedProducts.length) {
+                      // Loading indicator
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: CircularProgressIndicator(),
                         ),
-                  );
-                },
-              )
-              : ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: _filteredProduits.length,
-                itemBuilder: (context, index) {
-                  final produit = _filteredProduits[index];
-                  final bool isPanier = panierProvider.isProduitInPanier(
-                    produit.idproduit,
-                  );
-                  return _buildHorizontalCard(
-                    context,
-                    produit,
-                    panierProvider,
-                    isPanier,
-                  );
-                },
-              ),
+                      );
+                    }
+                    final produit = _displayedProducts[index];
+                    final bool isPanier = panierProvider.isProduitInPanier(
+                      produit.idproduit,
+                    );
+                    return ProductCard(
+                      produit: produit,
+                      isPanier: isPanier,
+                      isWideScreen: false,
+                      onTogglePanier: () async {
+                        final result = await panierProvider.clicPanier(
+                          produit.idproduit,
+                        );
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(result['message']),
+                              backgroundColor:
+                                  result['success']
+                                      ? Colors.green
+                                      : Styles.erreur,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      onTap:
+                          () => Navigator.pushNamed(
+                            context,
+                            '/utilisateur/produit/details',
+                            arguments: produit,
+                          ),
+                    );
+                  },
+                )
+                : ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _displayedProducts.length + (_hasMoreProducts ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == _displayedProducts.length) {
+                      // Loading indicator
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    final produit = _displayedProducts[index];
+                    final bool isPanier = panierProvider.isProduitInPanier(
+                      produit.idproduit,
+                    );
+                    return _buildHorizontalCard(
+                      context,
+                      produit,
+                      panierProvider,
+                      isPanier,
+                    );
+                  },
+                ),
+          ),
+          // Indicateur de chargement en bas si nécessaire
+          if (_isLoadingMore)
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: const CircularProgressIndicator(),
+            ),
+        ],
+      ),
     );
   }
 
@@ -1366,6 +1417,63 @@ class _ResultatsState extends State<Resultats> with TickerProviderStateMixin {
       _maxPriceController.clear();
       _performSearch();
     });
+  }
+
+  // Méthodes pour la pagination progressive
+  void _onScroll() {
+    if (_isLoadingMore || !_hasMoreProducts) return;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final threshold = maxScroll * 0.8;
+
+    if (currentScroll >= threshold) {
+      _loadMoreProducts();
+    }
+  }
+
+  void _loadMoreProducts() {
+    if (_isLoadingMore || !_hasMoreProducts) return;
+
+    setState(() => _isLoadingMore = true);
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        setState(() {
+          final currentDisplayedCount = _currentBatch * _batchSize;
+          final nextBatchEnd = (_currentBatch + 1) * _batchSize;
+
+          if (nextBatchEnd <= _allFilteredProducts.length) {
+            _currentBatch++;
+            _displayedProducts = _allFilteredProducts.take(nextBatchEnd).toList();
+          } else {
+            _hasMoreProducts = false;
+          }
+
+          _isLoadingMore = false;
+        });
+      }
+    });
+  }
+
+  void _resetPagination() {
+    _currentBatch = 1;
+    _displayedProducts = [];
+    _hasMoreProducts = true;
+    _isLoadingMore = false;
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0);
+    }
+  }
+
+  bool _areListsEqual(List<Produit> list1, List<Produit> list2) {
+    if (list1.length != list2.length) return false;
+    for (int i = 0; i < list1.length; i++) {
+      if (list1[i].idproduit != list2[i].idproduit) {
+        return false;
+      }
+    }
+    return true;
   }
 
   // Méthode pour afficher un snackbar (copiée de voirplus.dart)

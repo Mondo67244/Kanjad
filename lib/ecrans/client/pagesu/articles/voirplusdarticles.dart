@@ -32,6 +32,15 @@ class _VoirplusState extends State<Voirplus> with TickerProviderStateMixin {
   String _searchQuery = '';
   bool _showFilters = false;
 
+  // Pagination progressive
+  final ScrollController _scrollController = ScrollController();
+  static const int _batchSize = 20;
+  int _currentBatch = 1;
+  List<Produit> _allFilteredProducts = [];
+  List<Produit> _displayedProducts = [];
+  bool _isLoadingMore = false;
+  bool _hasMoreProducts = true;
+
   @override
   void initState() {
     super.initState();
@@ -47,6 +56,9 @@ class _VoirplusState extends State<Voirplus> with TickerProviderStateMixin {
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
     _fadeController.forward();
+
+    // Initialiser le listener pour la pagination infinie
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -135,6 +147,70 @@ class _VoirplusState extends State<Voirplus> with TickerProviderStateMixin {
     }
 
     return filtered;
+  }
+
+  // Méthode pour gérer le scroll automatique
+  void _onScroll() {
+    if (_isLoadingMore || !_hasMoreProducts) return;
+
+    // Détecter quand on arrive à 80% de la hauteur max
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final threshold = maxScroll * 0.8;
+
+    if (currentScroll >= threshold) {
+      _loadMoreProducts();
+    }
+  }
+
+  // Méthode pour charger plus de produits
+  void _loadMoreProducts() {
+    if (_isLoadingMore || !_hasMoreProducts) return;
+
+    setState(() => _isLoadingMore = true);
+
+    // Simuler un délai pour l'effet de chargement
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        setState(() {
+          // Calculer le nombre de produits à afficher
+          final currentDisplayedCount = _currentBatch * _batchSize;
+          final nextBatchEnd = (_currentBatch + 1) * _batchSize;
+
+          if (nextBatchEnd <= _allFilteredProducts.length) {
+            _currentBatch++;
+            _displayedProducts = _allFilteredProducts.take(nextBatchEnd).toList();
+          } else {
+            // Plus de produits à charger
+            _hasMoreProducts = false;
+          }
+
+          _isLoadingMore = false;
+        });
+      }
+    });
+  }
+
+  // Méthode pour réinitialiser la pagination lors des changements de filtres
+  void _resetPagination() {
+    _currentBatch = 1;
+    _displayedProducts = [];
+    _hasMoreProducts = true;
+    _isLoadingMore = false;
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0);
+    }
+  }
+
+  // Méthode pour comparer si deux listes sont égales
+  bool _areListsEqual(List<Produit> list1, List<Produit> list2) {
+    if (list1.length != list2.length) return false;
+    for (int i = 0; i < list1.length; i++) {
+      if (list1[i].idproduit != list2[i].idproduit) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @override
@@ -452,24 +528,6 @@ class _VoirplusState extends State<Voirplus> with TickerProviderStateMixin {
                     color: Styles.erreur,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Veuillez réessayer plus tard',
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => setState(() {}),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Styles.rouge,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                  ),
-                  child: const Text('Réessayer'),
-                ),
               ],
             ),
           );
@@ -495,11 +553,6 @@ class _VoirplusState extends State<Voirplus> with TickerProviderStateMixin {
                       color: Colors.grey,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Cette section sera bientôt remplie',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
                 ],
               ),
             ),
@@ -507,6 +560,14 @@ class _VoirplusState extends State<Voirplus> with TickerProviderStateMixin {
         }
 
         final filteredProducts = _filterAndSortProducts(snapshot.data!);
+
+        // Mettre à jour les produits filtrés si nécessaire
+        if (_allFilteredProducts.length != filteredProducts.length ||
+            !_areListsEqual(_allFilteredProducts, filteredProducts)) {
+          _allFilteredProducts = List.from(filteredProducts);
+          _resetPagination();
+          _displayedProducts = _allFilteredProducts.take(_batchSize).toList();
+        }
 
         if (filteredProducts.isEmpty) {
           return FadeTransition(
@@ -528,11 +589,6 @@ class _VoirplusState extends State<Voirplus> with TickerProviderStateMixin {
                       fontWeight: FontWeight.w600,
                       color: Colors.grey,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Essayez de modifier vos filtres',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
@@ -567,68 +623,99 @@ class _VoirplusState extends State<Voirplus> with TickerProviderStateMixin {
                   isWideScreen
                       ? const BoxConstraints(maxWidth: 1200)
                       : const BoxConstraints(maxWidth: 600),
-              child:
-                  isWideScreen
-                      ? GridView.builder(
-                        padding: const EdgeInsets.all(16),
-                        gridDelegate:
-                            const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 320,
-                              childAspectRatio: 0.84,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                            ),
-                        itemCount: filteredProducts.length,
-                        itemBuilder: (context, index) {
-                          final produit = filteredProducts[index];
-                          final bool isPanier = panierProvider
-                              .isProduitInPanier(produit.idproduit);
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            child: ProductCard(
-                              produit: produit,
-                              isPanier: isPanier,
-                              isWideScreen: isWideScreen,
-                              onTogglePanier: () async {
-                                final result = await panierProvider.clicPanier(
-                                  produit.idproduit,
-                                );
-                                _showSnackBar(
-                                  result['message'],
-                                  isSuccess: result['success'],
-                                );
-                              },
-                              onTap:
-                                  () => Navigator.pushNamed(
-                                    context,
-                                    '/utilisateur/produit/details',
-                                    arguments: produit,
-                                  ),
-                            ),
-                          );
-                        },
-                      )
-                      : ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: filteredProducts.length,
-                        itemBuilder: (context, index) {
-                          final produit = filteredProducts[index];
-                          final bool isPanier = panierProvider
-                              .isProduitInPanier(produit.idproduit);
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            margin: const EdgeInsets.only(bottom: 8),
-                            child: _buildHorizontalCard(
-                              context,
-                              produit,
-                              panierProvider,
-                              isPanier,
-                            ),
-                          );
-                        },
-                      ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: isWideScreen
+                        ? GridView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(16),
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                                maxCrossAxisExtent: 320,
+                                childAspectRatio: 0.84,
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                              ),
+                          itemCount: _displayedProducts.length + (_hasMoreProducts ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index == _displayedProducts.length) {
+                              // Loading indicator
+                              return const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            }
+                            final produit = _displayedProducts[index];
+                            final bool isPanier = panierProvider
+                                .isProduitInPanier(produit.idproduit);
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              child: ProductCard(
+                                produit: produit,
+                                isPanier: isPanier,
+                                isWideScreen: isWideScreen,
+                                onTogglePanier: () async {
+                                  final result = await panierProvider.clicPanier(
+                                    produit.idproduit,
+                                  );
+                                  _showSnackBar(
+                                    result['message'],
+                                    isSuccess: result['success'],
+                                  );
+                                },
+                                onTap:
+                                    () => Navigator.pushNamed(
+                                      context,
+                                      '/utilisateur/produit/details',
+                                      arguments: produit,
+                                    ),
+                              ),
+                            );
+                          },
+                        )
+                        : ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(16),
+                          itemCount: _displayedProducts.length + (_hasMoreProducts ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index == _displayedProducts.length) {
+                              // Loading indicator
+                              return const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            }
+                            final produit = _displayedProducts[index];
+                            final bool isPanier = panierProvider
+                                .isProduitInPanier(produit.idproduit);
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              margin: const EdgeInsets.only(bottom: 8),
+                              child: _buildHorizontalCard(
+                                context,
+                                produit,
+                                panierProvider,
+                                isPanier,
+                              ),
+                            );
+                          },
+                        ),
+                  ),
+                  // Indicateur de chargement en bas si nécessaire
+                  if (_isLoadingMore)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      child: const CircularProgressIndicator(),
+                    ),
+                ],
+              ),
             ),
           ),
         );
@@ -952,7 +1039,7 @@ class _VoirplusState extends State<Voirplus> with TickerProviderStateMixin {
                                   foregroundColor: Colors.black87,
                                   elevation: 0,
                                 ),
-                                child: const Text('Réinitialiser'),
+                                child: const Text('Effacer'),
                               ),
                             ),
                             const SizedBox(width: 12),

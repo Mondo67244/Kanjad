@@ -23,6 +23,7 @@ class _MettreEnAvantState extends State<MettreEnAvant> {
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
 
+  // Pagination progressive
   @override
   void initState() {
     super.initState();
