@@ -7,14 +7,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="description" content="Kanjad - Votre boutique en ligne de confiance pour équipements informatiques et électroniques">
+  <meta name="description"
+    content="Kanjad - Votre boutique en ligne de confiance pour équipements informatiques et électroniques">
   <meta name="keywords" content="boutique, ecommerce, informatique, électronique, kanjad, équipements">
   <meta name="author" content="Kanjad">
   <meta name="theme-color" content="#8D0D04">
 
   <!-- Open Graph / Social -->
   <meta property="og:title" content="Kanjad - Boutique en ligne">
-  <meta property="og:description" content="Votre boutique en ligne de confiance pour équipements informatiques et électroniques">
+  <meta property="og:description"
+    content="Votre boutique en ligne de confiance pour équipements informatiques et électroniques">
   <meta property="og:image" content="assets/assets/images/kanjad.png">
   <meta name="twitter:card" content="summary_large_image">
 
@@ -29,9 +31,9 @@
   <link rel="icon" type="image/png" href="favicon.png" />
 
   <!-- Preload critical scripts -->
-  <link rel="preload" href="main.dart.js" as="script">
-  <link rel="preload" href="flutter_bootstrap.js" as="script">
-  <link rel="preload" href="flutter.js" as="script">
+  <link rel="preload" href="main.dart.js" as="script" crossorigin="anonymous">
+  <link rel="preload" href="flutter_bootstrap.js" as="script" crossorigin="anonymous">
+  <link rel="preload" href="flutter.js" as="script" crossorigin="anonymous">
 
   <!-- Paiement -->
   <script src="https://cdn.cinetpay.com/seamless/main.js" defer></script>
@@ -76,6 +78,7 @@
       margin-top: 5px;
     }
   </style>
+
 </head>
 
 <body>
@@ -93,104 +96,56 @@
     </p>
   </noscript>
 
-  <script>
-    let currentVersion = null;
-    const assetsToPreload = [
-      'main.dart.js',
-      'flutter.js',
-      'flutter_bootstrap.js',
-      'assets/assets/images/kanjad.png'
-    ];
-    let loadedCount = 0;
+  <script
+      src="flutter_bootstrap.js" async>
 
-    async function checkForUpdate() {
-      try {
-        const res = await fetch('version.json?cacheBust=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) return;
-        const remoteVersion = await res.text();
+    // const assetsToPreload = [
+    //   'main.dart.js',
+    //   'flutter.js',
+    //   'flutter_bootstrap.js',
+    // ];
+    // let loadedCount = 0;
 
-        if (currentVersion === null) {
-          currentVersion = remoteVersion;
-          localStorage.setItem('app_version', remoteVersion);
-        } else if (remoteVersion !== currentVersion) {
-          showUpdateBanner();
-          localStorage.setItem('app_version', remoteVersion);
-        }
-      } catch (e) {
-        console.warn("Impossible de vérifier la version:", e);
-      }
-    }
+    // function updateProgress() {
+    //   const percent = Math.round((loadedCount / assetsToPreload.length) * 100);
+    //   document.getElementById('progress').textContent = `${percent}%`;
+    // }
 
-    function showUpdateBanner() {
-      if (document.getElementById("update-banner")) return;
+    // function startFlutter() {
+    //   const script = document.createElement('script');
+    //   script.src = 'flutter_bootstrap.js';
+    //   script.async = true;
+    //   script.onload = () => {
+    //     document.getElementById('logo').style.display = 'none';
+    //     document.getElementById('message').style.display = 'none';
+    //     document.getElementById('flutter-container').style.display = 'block';
+    //   };
+    //   document.body.appendChild(script);
+    // }
 
-      const banner = document.createElement("div");
-      banner.id = "update-banner";
-      banner.setAttribute("role", "alert");
-      banner.innerHTML = `
-        🚀 Nouvelle version disponible – <button id="reload-btn">Recharger</button>
-      `;
-      Object.assign(banner.style, {
-        position: "fixed",
-        top: "0",
-        left: "0",
-        width: "100%",
-        backgroundColor: "#222",
-        color: "#fff",
-        textAlign: "center",
-        padding: "10px",
-        zIndex: "9999",
-        fontFamily: "sans-serif",
-      });
+    // function fileLoaded() {
+    //   loadedCount++;
+    //   updateProgress();
+    //   if (loadedCount === assetsToPreload.length) {
+    //     startFlutter();
+    //   }
+    // }
 
-      document.body.appendChild(banner);
-
-      document.getElementById("reload-btn").onclick = () => {
-        location.reload(true);
-      };
-    }
-
-    function updateProgress() {
-      const percent = Math.round((loadedCount / assetsToPreload.length) * 100);
-      document.getElementById('progress').textContent = `${percent}%`;
-    }
-
-    function startFlutter() {
-      const script = document.createElement('script');
-      script.src = 'flutter_bootstrap.js';
-      script.async = true;
-      script.onload = () => {
-        document.getElementById('logo').style.display = 'none';
-        document.getElementById('message').style.display = 'none';
-        document.getElementById('flutter-container').style.display = 'block';
-      };
-      document.body.appendChild(script);
-
-      setInterval(checkForUpdate, 30000);
-    }
-
-    function fileLoaded() {
-      loadedCount++;
-      updateProgress();
-      if (loadedCount === assetsToPreload.length) {
-        startFlutter();
-      }
-    }
-
-    assetsToPreload.forEach(path => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', path, true);
-      xhr.responseType = 'blob';
-      xhr.onload = fileLoaded;
-      xhr.onerror = () => {
-        console.warn(`Erreur de préchargement pour ${path}`);
-        fileLoaded(); // on compte quand même
-      };
-      xhr.send();
-    });
-
-    checkForUpdate();
-  </script>
+    // // Préchargement via XHR
+    // assetsToPreload.forEach(path => {
+    //   const xhr = new XMLHttpRequest();
+    //   xhr.open('GET', path, true);
+    //   xhr.responseType = 'blob';
+    //   xhr.onload = fileLoaded;
+    //   xhr.onerror = () => {
+    //     console.warn(`Erreur de préchargement pour ${path}`);
+    //     fileLoaded(); // on compte quand même
+    //   };
+    //   xhr.send();
+    // });
+ 
+ 
+ </script>
 </body>
 
 </html>
