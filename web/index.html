@@ -9,7 +9,7 @@
 
   <meta name="description"
     content="Kanjad - Votre boutique en ligne de confiance pour équipements informatiques et électroniques">
-  <meta name="keywords" content="boutique, ecommerce, informatique, électronique, kanjad, équipements">
+  <meta name="keywords" content="boutique, ecommerce, informatique, électronique, kanjad, équipements, cameroun, akwa, castelnau, douala">
   <meta name="author" content="Kanjad">
   <meta name="theme-color" content="#8D0D04">
 
@@ -22,7 +22,7 @@
 
   <!-- PWA -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="red">
   <meta name="apple-mobile-web-app-title" content="Kanjad">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
   <link rel="manifest" href="manifest.json">
@@ -34,8 +34,10 @@
   <link rel="preload" href="main.dart.js" as="script" crossorigin="anonymous">
   <link rel="preload" href="flutter_bootstrap.js" as="script" crossorigin="anonymous">
   <link rel="preload" href="flutter.js" as="script" crossorigin="anonymous">
+  <link rel="preload" href="assets/assets/images/kanjad.png" as="image" crossorigin="anonymous">
 
   <!-- Paiement -->
+   
   <script src="https://cdn.cinetpay.com/seamless/main.js" defer></script>
 
   <title>Kanjad</title>
@@ -54,7 +56,7 @@
     }
 
     #logo {
-      width: 190px;
+      width: 210px;
       height: 85px;
       margin-bottom: 20px;
     }
@@ -65,86 +67,26 @@
       text-align: center;
       margin-top: 20px;
     }
-
-    #flutter-container {
-      display: none;
-      width: 100%;
-      height: 100%;
-    }
-
-    #progress {
-      color: white;
-      font-size: 14px;
-      margin-top: 5px;
-    }
   </style>
 
 </head>
 
 <body>
   <img id="logo" src="assets/assets/images/kanjad.png" alt="Logo Kanjad - Boutique en ligne">
-  <div id="message" role="status" aria-live="polite">
-    <strong>Chargement de Kanjad...</strong>
-    <div id="progress">0%</div>
+  <div id="message" role="status" aria-live="polite" aria-label="Page de chargement de l'application Kanjad">
+    <strong>Kanjad, la boutique e-commerce n°1<br>au Cameroun et ailleurs pour des achats simples et rapides !</strong>
   </div>
 
   <div id="flutter-container"></div>
 
   <noscript>
     <p style="color:white; text-align:center;">
-      ⚠️ JavaScript est requis pour utiliser l’application Kanjad.
+      JavaScript est requis pour utiliser l’application Kanjad.
     </p>
   </noscript>
 
   <script
-      src="flutter_bootstrap.js" async>
-
-    // const assetsToPreload = [
-    //   'main.dart.js',
-    //   'flutter.js',
-    //   'flutter_bootstrap.js',
-    // ];
-    // let loadedCount = 0;
-
-    // function updateProgress() {
-    //   const percent = Math.round((loadedCount / assetsToPreload.length) * 100);
-    //   document.getElementById('progress').textContent = `${percent}%`;
-    // }
-
-    // function startFlutter() {
-    //   const script = document.createElement('script');
-    //   script.src = 'flutter_bootstrap.js';
-    //   script.async = true;
-    //   script.onload = () => {
-    //     document.getElementById('logo').style.display = 'none';
-    //     document.getElementById('message').style.display = 'none';
-    //     document.getElementById('flutter-container').style.display = 'block';
-    //   };
-    //   document.body.appendChild(script);
-    // }
-
-    // function fileLoaded() {
-    //   loadedCount++;
-    //   updateProgress();
-    //   if (loadedCount === assetsToPreload.length) {
-    //     startFlutter();
-    //   }
-    // }
-
-    // // Préchargement via XHR
-    // assetsToPreload.forEach(path => {
-    //   const xhr = new XMLHttpRequest();
-    //   xhr.open('GET', path, true);
-    //   xhr.responseType = 'blob';
-    //   xhr.onload = fileLoaded;
-    //   xhr.onerror = () => {
-    //     console.warn(`Erreur de préchargement pour ${path}`);
-    //     fileLoaded(); // on compte quand même
-    //   };
-    //   xhr.send();
-    // });
- 
- 
+      src="flutter_bootstrap.js" defer>
  </script>
 </body>
 

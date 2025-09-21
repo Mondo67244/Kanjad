@@ -304,6 +304,16 @@ class _AccueiluState extends State<Accueilu> with TickerProviderStateMixin {
       drawer: Drawer(
         child: Consumer<NotificationService>(
           builder: (context, notificationService, child) {
+            String initiales = '';
+            if (_userData != null) {
+              final prenom = _userData!['prenomutilisateur'] as String? ?? '';
+              final nom = _userData!['nomutilisateur'] as String? ?? '';
+              if (prenom.isNotEmpty || nom.isNotEmpty) {
+                initiales =
+                    '${prenom.isNotEmpty ? prenom[0] : ''}${nom.isNotEmpty ? nom[0] : ''}'
+                        .toUpperCase();
+              }
+            }
             return ListView(
               padding: EdgeInsets.zero,
               children: [
@@ -313,14 +323,23 @@ class _AccueiluState extends State<Accueilu> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 30,
                         backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.person,
-                          size: 30,
-                          color: Styles.rouge,
-                        ),
+                        child: initiales.isNotEmpty
+                            ? Text(
+                                initiales,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  color: Styles.rouge,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.person,
+                                size: 30,
+                                color: Styles.rouge,
+                              ),
                       ),
                       const SizedBox(height: 10),
                       Text(

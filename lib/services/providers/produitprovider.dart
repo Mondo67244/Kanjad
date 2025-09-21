@@ -47,4 +47,21 @@ class ProductProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> deleteProduct(String produitId) async {
+    try {
+      // Call the service to delete from the database and storage
+      await _databaseService.deleteProduit(produitId);
+
+      // Remove from the local list
+      _products.removeWhere((product) => product.idproduit == produitId);
+      
+      // Notify listeners to update the UI
+      notifyListeners();
+    } catch (e) {
+      print('Error deleting product: $e');
+      // Optionally, handle the error more gracefully in the UI
+      rethrow; // Rethrow to be caught by the UI layer
+    }
+  }
 }

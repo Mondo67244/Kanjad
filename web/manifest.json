@@ -1,35 +1,43 @@
 {
-    "name": "Kanjad",
+    "name": "Kanjad - Boutique en ligne",
     "short_name": "Kanjad",
-    "start_url": ".",
+    "id": "/?homescreen=1",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "L'application de e-commerce numero 1 au cameroun et ailleurs !. Achats simples et rapides.",
+    "background_color": "#8D0D04",
+    "theme_color": "#8D0D04",
+    "description": "Kanjad, la boutique e-commerce n°1 au Cameroun pour des achats simples et rapides d'équipements informatiques et électroniques.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
+    "categories": ["shopping", "ecommerce", "technology"],
     "icons": [
-        {
-            "src": "icons/Icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-maskable-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "icons/Icon-maskable-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
+      {
+        "src": "icons/Icon-192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "icons/Icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      },
+      {
+        "src": "icons/Icon-maskable-192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "maskable"
+      },
+      {
+        "src": "icons/Icon-maskable-512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable"
+      },
+      {
+        "src": "icons/Icon-144.png",
+        "sizes": "144x144",
+        "type": "image/png"
+      }
     ]
-}
+  }

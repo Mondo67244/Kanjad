@@ -5,6 +5,7 @@ import 'package:kanjad/services/BD/supabase.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:kanjad/widgets/kanjadappbar.dart';
 import 'package:kanjad/widgets/indicateurdetats.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class VoirClientsPage extends StatefulWidget {
   const VoirClientsPage({super.key});
@@ -185,13 +186,11 @@ class _VoirClientsPageState extends State<VoirClientsPage> {
   }
 
   Widget _carteClient(Utilisateur client) {
+    final prenom = client.prenomutilisateur ?? '';
+    final nom = client.nomutilisateur ?? '';
     final initiales =
-        client.prenomutilisateur?.isNotEmpty == true
-            ? client.prenomutilisateur![0]
-            : '';
-    client.nomutilisateur?.isNotEmpty == true
-        ? client.nomutilisateur![0]
-        : ''.toUpperCase();
+        '${prenom.isNotEmpty ? prenom[0] : ''}${nom.isNotEmpty ? nom[0] : ''}'
+            .toUpperCase();
 
     final bool isAdmin = client.roleutilisateur == 'admin';
 
@@ -200,85 +199,251 @@ class _VoirClientsPageState extends State<VoirClientsPage> {
       margin: const EdgeInsets.symmetric(vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: Styles.rouge.withOpacity(0.1),
-              child: Text(
-                initiales,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Styles.rouge,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _voirDetailsClient(context, client),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: Styles.rouge.withOpacity(0.1),
+                child: Text(
+                  initiales,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Styles.rouge,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          '${client.prenomutilisateur ?? ''} ${client.nomutilisateur ?? ''}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Chip(
-                        label: Text(
-                          client.roleutilisateur,
-                          style: TextStyle(
-                            color:
-                                isAdmin
-                                    ? Colors.orange[800]
-                                    : Colors.green[800],
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '$prenom $nom',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        backgroundColor:
-                            isAdmin ? Colors.orange[100] : Colors.green[100],
-                        padding: const EdgeInsets.symmetric(horizontal: 6),
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        visualDensity: VisualDensity.compact,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        FluentIcons.mail_24_regular,
-                        size: 16,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          client.emailutilisateur,
-                          style: TextStyle(color: Colors.grey[700]),
-                          overflow: TextOverflow.ellipsis,
+                        Chip(
+                          label: Text(
+                            client.roleutilisateur,
+                            style: TextStyle(
+                              color:
+                                  isAdmin
+                                      ? Colors.orange[800]
+                                      : Colors.green[800],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                          backgroundColor:
+                              isAdmin ? Colors.orange[100] : Colors.green[100],
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          FluentIcons.mail_24_regular,
+                          size: 16,
+                          color: Colors.grey[600],
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            client.emailutilisateur,
+                            style: TextStyle(color: Colors.grey[700]),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+
+  void _voirDetailsClient(BuildContext context, Utilisateur client) {
+    final prenom = client.prenomutilisateur ?? '';
+    final nom = client.nomutilisateur ?? '';
+    final initiales =
+        '${prenom.isNotEmpty ? prenom[0] : ''}${nom.isNotEmpty ? nom[0] : ''}'
+            .toUpperCase();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.6,
+          maxChildSize: 0.9,
+          builder: (_, controller) {
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: ListView(
+                controller: controller,
+                children: [
+                  // Entête
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundColor: Styles.rouge.withOpacity(0.1),
+                          child: Text(
+                            initiales,
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Styles.rouge,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          '$prenom $nom',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        Text(client.emailutilisateur),
+                        const SizedBox(height: 8),
+                        Chip(
+                          label: Text(
+                            'Rôle: ${client.roleutilisateur}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 32),
+
+                  // Actions
+                  ListTile(
+                    leading: const Icon(FluentIcons.person_accounts_24_regular),
+                    title: const Text('Changer le rôle'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _changerRoleUtilisateur(client);
+                    },
+                  ),
+                  // 
+                  const Divider(thickness: 1, indent: 16, endIndent: 16),
+                  // ListTile(
+                  //   leading: Icon(FluentIcons.delete_24_regular, color: Colors.red.shade700),
+                  //   title: Text('Supprimer l\'utilisateur', style: TextStyle(color: Colors.red.shade700)),
+                  //   onTap: () {
+                  //     Navigator.pop(context);
+                  //     _confirmerSuppressionUtilisateur(client);
+                  //   },
+                  // ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // void _confirmerSuppressionUtilisateur(Utilisateur client) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Supprimer l\'utilisateur'),
+  //       content: Text('Voulez-vous vraiment supprimer ${client.prenomutilisateur} ${client.nomutilisateur}? Cette action est irréversible.'),
+  //       actions: [
+  //         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
+  //         TextButton(
+  //           onPressed: () {
+  //             Navigator.pop(context);
+  //             _supprimerUtilisateur(client);
+  //           },
+  //           style: TextButton.styleFrom(foregroundColor: Colors.red),
+  //           child: const Text('Supprimer'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // void _supprimerUtilisateur(Utilisateur client) async {
+  //   try {
+  //     await SupabaseService.instance.deleteUser(client.idutilisateur);
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Utilisateur supprimé.'), backgroundColor: Colors.green));
+  //       _rafraichirClients();
+  //     }
+  //   } catch (e) {
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red));
+  //     }
+  //   }
+  // }
+
+  void _changerRoleUtilisateur(Utilisateur client) {
+    final roles = ['client', 'commercial', 'livreur', 'admin'];
+    showDialog(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: Text('Changer le rôle de ${client.prenomutilisateur}'),
+          children: roles.map((role) {
+            return SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context);
+                _mettreAJourRole(client, role);
+              },
+              child: Text(role, style: TextStyle(fontWeight: client.roleutilisateur == role ? FontWeight.bold : FontWeight.normal)),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  void _mettreAJourRole(Utilisateur client, String newRole) async {
+    try {
+      await Supabase.instance.client
+          .from('utilisateurs')
+          .update({'roleutilisateur': newRole})
+          .eq('idutilisateur', client.idutilisateur);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rôle mis à jour.'), backgroundColor: Colors.green));
+        _rafraichirClients();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red));
+      }
+    }
+  }
 }
+

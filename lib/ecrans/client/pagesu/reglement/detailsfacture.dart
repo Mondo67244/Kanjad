@@ -76,25 +76,7 @@ class _VoirFactureState extends State<VoirFacture> {
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
         ),
         actions: [
-          IconButton(
-            tooltip: 'Imprimer',
-            icon: const Icon(Icons.print),
-            onPressed: () async {
-              final bytes =
-                  await FacturePdfService.generateFacturePdf(widget.facture);
-              if (kIsWeb) {
-                await Printing.layoutPdf(
-                  onLayout: (format) async => bytes,
-                  name: 'Facture_${widget.facture.idfacture}.pdf',
-                );
-              } else {
-                await Printing.sharePdf(
-                  bytes: bytes,
-                  filename: 'Facture_${widget.facture.idfacture}.pdf',
-                );
-              }
-            },
-          ),
+          
           IconButton(
             tooltip: 'Télécharger',
             icon: const Icon(Icons.download),

@@ -486,11 +486,52 @@ class SupabaseService {
         'Deleting produit with ID: $produitId',
         name: 'SupabaseService.deleteProduit',
       );
+
+      // 1. Get product details to find image files
+      final produitData = await supabase
+          .from(produitsTable)
+          .select('categorie, img1, img2, img3')
+          .eq('idproduit', produitId)
+          .maybeSingle();
+
+      
       await supabase.from(produitsTable).delete().eq('idproduit', produitId);
+      
       developer.log(
-        'Successfully deleted produit with ID: $produitId',
+        'Successfully deleted product record for ID: $produitId.',
         name: 'SupabaseService.deleteProduit',
       );
+
+      if (produitData != null) {
+        final categorie = produitData['categorie'] as String?;
+        if (categorie == null || categorie.isEmpty) {
+            developer.log('Category is null or empty, cannot determine bucket for image deletion.', name: 'SupabaseService.deleteProduit');
+        } else {
+            final bucketName = getBucketName(categorie);
+            
+            final List<String> imagesToDelete = [];
+            final img1 = produitData['img1'] as String?;
+            final img2 = produitData['img2'] as String?;
+            final img3 = produitData['img3'] as String?;
+
+            if (img1 != null && img1.isNotEmpty) imagesToDelete.add(img1);
+            if (img2 != null && img2.isNotEmpty) imagesToDelete.add(img2);
+            if (img3 != null && img3.isNotEmpty) imagesToDelete.add(img3);
+
+            // 3. Delete images from storage if any
+            if (imagesToDelete.isNotEmpty) {
+              // The file names might be full URLs. We need to extract the path.
+              final fileNames = imagesToDelete.map((url) => path.basename(Uri.parse(url).path)).toList();
+              
+              developer.log(
+                'Deleting images from bucket $bucketName: $fileNames',
+                name: 'SupabaseService.deleteProduit',
+              );
+              await supabase.storage.from(bucketName).remove(fileNames);
+            }
+        }
+      }
+
     } catch (e, stackTrace) {
       developer.log(
         'Error in deleteProduit: $e',
@@ -612,6 +653,39 @@ class SupabaseService {
       rethrow;
     }
   }
+
+  // Future<void> deleteUser(String userId) async {
+  //   try {
+  //     developer.log(
+  //       'Invoking edge function to delete user with ID: $userId',
+  //       name: 'SupabaseService.deleteUser',
+  //     );
+
+     
+  //     final response = await supabase.functions.invoke('delete-user', body: {'user_id': userId});
+
+  //     if (response.status != 200) {
+  //       final errorData = response.data as Map<String, dynamic>?;
+  //       throw Exception('Failed to delete user: ${errorData?['error'] ?? 'Unknown error'}');
+  //     }
+      
+  //     developer.log(
+  //       'Successfully invoked edge function to delete user with ID: $userId',
+  //       name: 'SupabaseService.deleteUser',
+  //     );
+  //   } catch (e, stackTrace) {
+  //     developer.log(
+  //       'Error in deleteUser: $e',
+  //       name: 'SupabaseService.deleteUser',
+  //       error: e,
+  //       stackTrace: stackTrace,
+  //     );
+  //     print('Erreur dans deleteUser: $e');
+  //     print('Stack trace: $stackTrace');
+  //     rethrow;
+  //   }
+  // }
+
 
   //Debut commande
   Future<void> updateCommandePaiement(
