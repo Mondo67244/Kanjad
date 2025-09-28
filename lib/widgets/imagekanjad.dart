@@ -147,12 +147,12 @@ class _KanjadImageState extends State<KanjadImage> {
         fit: widget.fit,
         width: widget.width,
         height: widget.height,
-        errorBuilder: (context, error, stackTrace) => _buildErrorWidget(),
+        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
       );
     }
 
     if (_hasError || _resolvedImageUrl == null) {
-      return _buildErrorWidget();
+      return _buildPlaceholder();
     }
 
     return _buildNetworkImage(_resolvedImageUrl!);
@@ -169,7 +169,7 @@ class _KanjadImageState extends State<KanjadImage> {
           valueColor: AlwaysStoppedAnimation<Color>(Styles.rouge),
         ),
       ),
-      errorWidget: (context, url, error) => _buildErrorWidget(),
+      errorWidget: (context, url, error) => _buildPlaceholder(),
       fadeInDuration: const Duration(milliseconds: 300),
     );
   }
@@ -189,18 +189,5 @@ class _KanjadImageState extends State<KanjadImage> {
     );
   }
 
-  Widget _buildErrorWidget() {
-    return Container(
-      width: widget.width,
-      height: widget.height,
-      color: Colors.grey.shade200,
-      child: Center(
-        child: Icon(
-          Icons.error_outline,
-          color: Colors.red.shade400,
-          size: 48,
-        ),
-      ),
-    );
-  }
+  
 }
