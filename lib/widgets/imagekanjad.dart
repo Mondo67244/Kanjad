@@ -1,3 +1,4 @@
+import 'package:kanjad/services/cache/image_cache_manager.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -161,6 +162,7 @@ class _KanjadImageState extends State<KanjadImage> {
   Widget _buildNetworkImage(String url) {
     return CachedNetworkImage(
       imageUrl: url,
+      cacheManager: KanjadCacheManager.instance,
       fit: widget.fit,
       width: widget.width,
       height: widget.height,

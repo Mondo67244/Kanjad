@@ -38,6 +38,14 @@ class RecentsState extends State<Recents>
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
     _fadeController.forward();
+
+    // Déclencher le chargement des données si elles ne sont pas déjà chargées
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+      if (!productProvider.isLoaded) {
+        _refreshData();
+      }
+    });
   }
 
   @override
@@ -410,28 +418,18 @@ class RecentsState extends State<Recents>
       );
     }
 
+    final int limit = isWideScreen ? 8 : 5;
+
     final dansBureautique =
-        produits.where((p) => p.souscategorie == 'Bureautique').toList();
+        produits.where((p) => p.souscategorie == 'Bureautique').toList()..shuffle();
     final dansReseau =
-        produits.where((p) => p.souscategorie == 'Réseau').toList();
+        produits.where((p) => p.souscategorie == 'Réseau').toList()..shuffle();
     final dansMobiles =
-        produits.where((p) => p.souscategorie == 'Appareils Mobiles').toList();
+        produits.where((p) => p.souscategorie == 'Appareils Mobiles').toList()..shuffle();
     final dansPopulaires = produits.where((p) => p.vues >= 100).toList()
       ..sort((a, b) => b.vues.compareTo(a.vues));
     final dansAccessoires =
-        produits.where((p) => p.souscategorie == 'Accessoires').toList();
-    
-    final produitsBureautique =
-        dansBureautique.take(_produits['Bureautique'] ?? 5).toList();
-    final produitsReseau =
-        dansReseau.take(_produits['Réseau'] ?? 5).toList();
-    final produitsMobiles =
-        dansMobiles.take(_produits['Appareils Mobiles'] ?? 5).toList();
-    final produitsPopulaires =
-        dansPopulaires.take(_produits['Populaires'] ?? 5).toList();
-    final produitsAccessoires =
-        dansAccessoires.take(_produits['Accessoires'] ?? 5).toList();
-            
+        produits.where((p) => p.souscategorie == 'Accessoires').toList()..shuffle();
 
     return Container(
       decoration: const BoxDecoration(
@@ -447,12 +445,13 @@ class RecentsState extends State<Recents>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section Populaires
-            if (produitsPopulaires.isNotEmpty) ...[
+            if (dansPopulaires.isNotEmpty) ...[
               ProductSection(
                 title: isWideScreen ? 'Nos Articles les plus populaires' : 'Articles Populaires',
                 subtitle: 'Les plus consultés',
                 icon: Icons.trending_up,
-                produits: produitsPopulaires,
+                allProduits: dansPopulaires,
+                initialLimit: limit,
                 isWideScreen: isWideScreen,
                 onTogglePanier: _toggleAuPanier,
                 onTap:
@@ -462,9 +461,6 @@ class RecentsState extends State<Recents>
                       arguments: produit,
                     ),
                 idsPanier: idsPanier,
-                hasMore:
-                    produitsPopulaires.length < dansPopulaires.length,
-                onLoadMore: () => _onLoadMore('Populaires'),
                 onVoirPlus:
                     () => Navigator.pushNamed(
                       context,
@@ -476,12 +472,13 @@ class RecentsState extends State<Recents>
             ],
 
             // Section Mobiles
-            if (produitsMobiles.isNotEmpty) ...[
+            if (dansMobiles.isNotEmpty) ...[
               ProductSection(
                 title: isWideScreen ? 'Appareils Mobiles' : 'Appareils de la catégorie Mobile',
                 subtitle: 'Tous les derniers gadgets du moment',
                 icon: Icons.phone_android,
-                produits: produitsMobiles,
+                allProduits: dansMobiles,
+                initialLimit: limit,
                 isWideScreen: isWideScreen,
                 onTogglePanier: _toggleAuPanier,
                 onTap:
@@ -491,8 +488,6 @@ class RecentsState extends State<Recents>
                       arguments: produit,
                     ),
                 idsPanier: idsPanier,
-                hasMore: produitsMobiles.length < dansMobiles.length,
-                onLoadMore: () => _onLoadMore('Appareils Mobiles'),
                 onVoirPlus:
                     () => Navigator.pushNamed(
                       context,
@@ -504,12 +499,13 @@ class RecentsState extends State<Recents>
             ],
 
             // Section Bureautique
-            if (produitsBureautique.isNotEmpty) ...[
+            if (dansBureautique.isNotEmpty) ...[
               ProductSection(
                 title: isWideScreen ?'Appareils de la catégorie Bureautique' : 'Appareils de Bureautique',
                 subtitle: 'Outils de productivité',
                 icon: Icons.computer,
-                produits: produitsBureautique,
+                allProduits: dansBureautique,
+                initialLimit: limit,
                 isWideScreen: isWideScreen,
                 onTogglePanier: _toggleAuPanier,
                 onTap:
@@ -519,9 +515,6 @@ class RecentsState extends State<Recents>
                       arguments: produit,
                     ),
                 idsPanier: idsPanier,
-                hasMore:
-                    produitsBureautique.length < dansBureautique.length,
-                onLoadMore: () => _onLoadMore('Bureautique'),
                 onVoirPlus:
                     () => Navigator.pushNamed(
                       context,
@@ -533,12 +526,13 @@ class RecentsState extends State<Recents>
             ],
 
             // Section Réseau
-            if (produitsReseau.isNotEmpty) ...[
+            if (dansReseau.isNotEmpty) ...[
               ProductSection(
                 title: isWideScreen ? 'Appareils de la catégorie Réseau' :'Appareils Réseau',
                 subtitle: 'Connectivité et communication',
                 icon: Icons.network_wifi,
-                produits: produitsReseau,
+                allProduits: dansReseau,
+                initialLimit: limit,
                 isWideScreen: isWideScreen,
                 onTogglePanier: _toggleAuPanier,
                 onTap:
@@ -548,8 +542,6 @@ class RecentsState extends State<Recents>
                       arguments: produit,
                     ),
                 idsPanier: idsPanier,
-                hasMore: produitsReseau.length < dansReseau.length,
-                onLoadMore: () => _onLoadMore('Réseau'),
                 onVoirPlus:
                     () => Navigator.pushNamed(
                       context,
@@ -561,12 +553,13 @@ class RecentsState extends State<Recents>
             ],
 
             // Section Accessoires
-            if (produitsAccessoires.isNotEmpty) ...[
+            if (dansAccessoires.isNotEmpty) ...[
               ProductSection(
                 title: isWideScreen ? 'Appareils de la catégorie des Accessoires' : 'Vos nouveaux Accessoires',
                 subtitle: 'Complétez votre équipement',
                 icon: Icons.headphones,
-                produits: produitsAccessoires,
+                allProduits: dansAccessoires,
+                initialLimit: limit,
                 isWideScreen: isWideScreen,
                 onTogglePanier: _toggleAuPanier,
                 onTap:
@@ -576,9 +569,6 @@ class RecentsState extends State<Recents>
                       arguments: produit,
                     ),
                 idsPanier: idsPanier,
-                hasMore:
-                    produitsAccessoires.length < dansAccessoires.length,
-                onLoadMore: () => _onLoadMore('Accessoires'),
                 onVoirPlus:
                     () => Navigator.pushNamed(
                       context,

@@ -2,8 +2,7 @@ import 'dart:async';
 import 'package:kanjad/ecrans/admin/ajoututilisateur.dart';
 import 'package:kanjad/ecrans/admin/mettreenavant.dart';
 import 'package:kanjad/ecrans/admin/pagepromotion.dart';
-import 'package:kanjad/ecrans/admin/promotiondroite.dart';
-import 'package:kanjad/ecrans/admin/promotiongauche.dart';
+import 'package:kanjad/ecrans/admin/gestionpromotion.dart';
 import 'package:kanjad/ecrans/admin/statistiquesglob.dart';
 import 'package:kanjad/ecrans/admin/voirclients.dart';
 import 'package:kanjad/ecrans/livreur/accueilliv.dart';
@@ -158,9 +157,9 @@ class MyApp extends StatelessWidget {
         '/admin/promotion':
             (context) => const ProtectionAdmin(child: PromotionPage()),
         '/admin/promotion/gauche':
-            (context) => const ProtectionAdmin(child: PromotionGauchePage()),
+            (context) => const ProtectionAdmin(child: GestionPromotionPage(cote: 'gauche')),
         '/admin/promotion/droite':
-            (context) => const ProtectionAdmin(child: PromotionDroitePage()),
+            (context) => const ProtectionAdmin(child: GestionPromotionPage(cote: 'droite')),
         '/admin/mettre_en_avant':
             (context) => const ProtectionAdmin(child: MettreEnAvant()),
         '/admin/messages':

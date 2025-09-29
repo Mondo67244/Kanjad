@@ -35,23 +35,21 @@ class _EcranDemarrageState extends State<EcranDemarrage> {
 
   Future<void> _initializeAndNavigate() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final bool isFirstLaunch = prefs.getBool('is_first_launch') ?? true;
+      // Just show the animation and navigate. Data loading is now deferred.
+      setState(() {
+        _loadingMessage = 'Bienvenue sur Kanjad...';
+        _progress = 0.5;
+      });
 
-      // Load all data, forcing a refresh only on the first launch
-      await _loadAllData(forceRefresh: isFirstLaunch);
-
-      // Mark first launch as complete
-      if (isFirstLaunch) {
-        await prefs.setBool('is_first_launch', false);
-      }
+      // Simulate a short delay for the animation
+      await Future.delayed(const Duration(milliseconds: 2500));
 
       setState(() {
-        _loadingMessage = 'Tout est prêt !  sur Kanjad.';
+        _loadingMessage = 'Tout est prêt !';
         _progress = 1.0;
       });
 
-      await Future.delayed(const Duration(milliseconds: 2300));
+      await Future.delayed(const Duration(milliseconds: 1000));
 
       if (mounted) {
         final currentUser = Supabase.instance.client.auth.currentUser;
@@ -62,59 +60,31 @@ class _EcranDemarrageState extends State<EcranDemarrage> {
           if (userProfile != null) {
             navigateBasedOnRoleOnStart(context, userProfile);
           } else {
+            // If profile doesn't exist for a logged-in user, go to home.
             Navigator.pushReplacementNamed(context, '/accueil');
           }
         } else {
+          // If no user, go to home.
           Navigator.pushReplacementNamed(context, '/accueil');
         }
       }
     } catch (e) {
       if (!mounted) return;
-      String errorMessage = 'Une erreur est survenue lors du chargement.';
+      String errorMessage = 'Une erreur est survenue lors du démarrage.';
       if (e is SocketException) {
         errorMessage =
-            'Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.';
+            'Erreur de connexion. Veuillez vérifier votre connexion internet.';
       }
       MessagerieService.showError(context, errorMessage);
-      // Optionally, navigate to an error screen or allow retry
+      // Fallback to connexion page on critical error
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/connexion');
       }
     }
   }
 
-  Future<void> _loadAllData({bool forceRefresh = false}) async {
-    final productProvider = Provider.of<ProductProvider>(
-      context,
-      listen: false,
-    );
-    final panierProvider = Provider.of<PanierProvider>(context, listen: false);
-    final souhaitsProvider = Provider.of<SouhaitsProvider>(
-      context,
-      listen: false,
-    );
-
-    // Step 1: Load products
-    setState(() {
-      _loadingMessage = 'Chargement des produits...';
-      _progress = 0.1;
-    });
-    await productProvider.loadProducts(forceRefresh: forceRefresh);
-
-    // Step 2: Load cart
-    setState(() {
-      _loadingMessage = 'Synchronisation du panier...';
-      _progress = 0.5;
-    });
-    await panierProvider.loadPanier();
-
-    // Step 3: Load wishlist
-    setState(() {
-      _loadingMessage = 'Synchronisation des souhaits...';
-      _progress = 0.8;
-    });
-    await souhaitsProvider.loadSouhaits();
-  }
+  // This function is no longer needed here, it will be handled by providers/screens.
+  // Future<void> _loadAllData({bool forceRefresh = false}) async { ... }
 
   @override
   Widget build(BuildContext context) {
