@@ -1873,4 +1873,32 @@ class SupabaseService {
           return commandes;
         });
   }
+
+  Future<void> decrementStockForOrder(Commande commande) async {
+    try {
+      for (final produitInCommande in commande.produits) {
+        final String produitId = produitInCommande['idproduit'];
+        final int quantiteVendue = produitInCommande['quantite'];
+
+        // Appel d'une fonction RPC sur Supabase pour décrémenter la quantité
+        await supabase.rpc('decrement_product_quantity', params: {
+          'product_id_in': produitId,
+          'quantity_in': quantiteVendue,
+        });
+      }
+      developer.log(
+        'Successfully decremented stock for order ID: ${commande.idcommande}',
+        name: 'SupabaseService.decrementStockForOrder',
+      );
+    } catch (e, stackTrace) {
+      developer.log(
+        'Error in decrementStockForOrder for order ID: ${commande.idcommande}: $e',
+        name: 'SupabaseService.decrementStockForOrder',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      // Ne pas relancer l'erreur pour ne pas bloquer l'UI, mais la logger est crucial.
+    }
+  }
 }
+

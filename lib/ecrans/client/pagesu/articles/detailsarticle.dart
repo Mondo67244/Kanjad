@@ -395,6 +395,23 @@ class _DetailsState extends State<Details> {
                   ),
                 ),
               ],
+              if (produit.quantite < 6 && produit.quantite > 0) ...[
+                const SizedBox(width: 8),
+                Chip(
+                  label: Text(
+                    'Bientôt épuisé',
+                    style: TextStyle(
+                      color: Colors.red.shade800,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  backgroundColor: Colors.red.shade100,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 24),
@@ -507,25 +524,41 @@ class _DetailsState extends State<Details> {
               
             ],
           ),
-          if (produit.vues >= 100) ...[
-                const SizedBox(width: 16),
-                Chip(
-                  avatar: Icon(FluentIcons.star_20_regular,
-                      size: 16, color: Colors.orange.shade700),
-                  label: Text(
-                    '${produit.vues} vues',
-                    style: TextStyle(
-                      color: Colors.orange.shade800,
-                      fontWeight: FontWeight.w600,
+          if (produit.vues >= 100 || (produit.quantite < 6 && produit.quantite > 0)) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (produit.vues >= 100)
+                  Chip(
+                    avatar: Icon(FluentIcons.star_20_regular, size: 16, color: Colors.orange.shade700),
+                    label: Text(
+                      '${produit.vues} vues',
+                      style: TextStyle(
+                        color: Colors.orange.shade800,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
+                    backgroundColor: Colors.orange.shade100,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   ),
-                  backgroundColor: Colors.orange.shade100,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                if (produit.quantite < 6 && produit.quantite > 0)
+                  Chip(
+                    avatar: Icon(FluentIcons.warning_20_regular, size: 16, color: Colors.red.shade700),
+                    label: Text(
+                      'Bientôt épuisé',
+                      style: TextStyle(
+                        color: Colors.red.shade800,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    backgroundColor: Colors.red.shade100,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   ),
-                ),
               ],
+            ),
+          ],
           const SizedBox(height: 24),
           Text(
             'Caractéristiques du produit :',

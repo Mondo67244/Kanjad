@@ -409,8 +409,11 @@ class _VoirCommandesPageState extends State<VoirCommandesPage> {
   void _validerCommande(BuildContext context, Commande commande) async {
     try {
       await SupabaseService.instance.majStatut(commande.idcommande, 'Validée');
+      // Décrémenter le stock après validation
+      await SupabaseService.instance.decrementStockForOrder(commande);
+
       if (context.mounted) {
-        MessagerieService.showSuccess(context, 'Commande validée !');
+        MessagerieService.showSuccess(context, 'Commande validée et stock mis à jour !');
         _refreshCommandes();
       }
     } catch (e) {

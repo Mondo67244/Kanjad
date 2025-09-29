@@ -509,6 +509,10 @@ class _PaiementPageState extends State<PaiementPage>
       _selectedPaymentMethod!,
       _phoneController.text.trim(),
     );
+
+    // Décrémenter le stock
+    await SupabaseService.instance.decrementStockForOrder(widget.commande);
+
     await _genfactures();
 
     setState(() {

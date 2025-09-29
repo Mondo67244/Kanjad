@@ -189,6 +189,12 @@ class _AccueilaState extends State<Accueila> {
         'color': Colors.orange,
       },
       {
+        'route': '/admin/gestion_stock', // Nouvelle page
+        'icon': FluentIcons.box_multiple_24_filled, // Nouvelle icône
+        'text': 'Gestion des Stocks', // Nouveau texte
+        'color': Colors.brown, // Nouvelle couleur
+      },
+      {
         'route': '/admin/voir_clients',
         'icon': FluentIcons.people_audience_24_filled,
         'text': 'Nos Clients',

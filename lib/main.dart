@@ -3,6 +3,7 @@ import 'package:kanjad/ecrans/admin/ajoututilisateur.dart';
 import 'package:kanjad/ecrans/admin/mettreenavant.dart';
 import 'package:kanjad/ecrans/admin/pagepromotion.dart';
 import 'package:kanjad/ecrans/admin/gestionpromotion.dart';
+import 'package:kanjad/ecrans/admin/gestionstock.dart';
 import 'package:kanjad/ecrans/admin/statistiquesglob.dart';
 import 'package:kanjad/ecrans/admin/voirclients.dart';
 import 'package:kanjad/ecrans/livreur/accueilliv.dart';
@@ -164,6 +165,8 @@ class MyApp extends StatelessWidget {
             (context) => const ProtectionAdmin(child: MettreEnAvant()),
         '/admin/messages':
             (context) => const ProtectionAdmin(child: CommercialDashboard()),
+        '/admin/gestion_stock':
+            (context) => const ProtectionAdmin(child: GestionStockPage()),
         '/utilisateur/commandes': (context) => const CommandesPage(),
         '/utilisateur/parametres': (context) => const ParametresPage(),
         '/utilisateur/parametres/discussions':
