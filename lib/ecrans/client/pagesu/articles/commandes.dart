@@ -416,7 +416,7 @@ class _CommandesPageState extends State<CommandesPage> {
       barrierDismissible: false,
       builder:
           (context) => const KanJadLoadingDialog(
-            title: 'Gestion de la facture',
+            title: 'Production de la facture',
             message: 'Veuillez patienter...', 
           ),
     );
@@ -592,7 +592,7 @@ class _CommandesPageState extends State<CommandesPage> {
           body: Container(
             constraints:
                 isWideScreen
-                    ? BoxConstraints(maxWidth: 600)
+                    ? BoxConstraints(maxWidth: 400)
                     : BoxConstraints(maxWidth: 400),
             child: StreamBuilder<List<Commande>>(
               stream: _commandesStream,
@@ -750,7 +750,7 @@ class _OrderCardWidgetState extends State<OrderCardWidget> {
   late String displayDate;
   bool _isLoadingInvoiceDate = false;
   bool _majEncours = false;
-  bool? _invoiceExists;
+  bool? _factureExiste;
 
   @override
   void initState() {
@@ -758,7 +758,7 @@ class _OrderCardWidgetState extends State<OrderCardWidget> {
     displayDate = widget.commande.datecommande;
     if (widget.commande.statutpaiement == 'Payé' ||
         widget.commande.statutpaiement == 'Terminé') {
-      _fetchInvoiceDate();
+      _recupereDateCommande();
       _checkInvoice();
     }
   }
@@ -769,12 +769,12 @@ class _OrderCardWidgetState extends State<OrderCardWidget> {
     );
     if (mounted) {
       setState(() {
-        _invoiceExists = (facture != null);
+        _factureExiste = (facture != null);
       });
     }
   }
 
-  Future<void> _fetchInvoiceDate() async {
+  Future<void> _recupereDateCommande() async {
     if (_isLoadingInvoiceDate || !mounted) return;
     setState(() => _isLoadingInvoiceDate = true);
     try {
@@ -869,7 +869,7 @@ class _OrderCardWidgetState extends State<OrderCardWidget> {
           () => _majStatut('Terminé'),
         );
       } else if (paymentStatus == 'Terminé') {
-        if (_invoiceExists == null) {
+        if (_factureExiste == null) {
           return const Center(
             child: SizedBox(
               width: 20,

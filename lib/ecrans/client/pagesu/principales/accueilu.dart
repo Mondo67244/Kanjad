@@ -407,7 +407,7 @@ class _AccueiluState extends State<Accueilu> with TickerProviderStateMixin {
                       Navigator.pushNamed(context, '/utilisateur/parametres');
                     },
                   ),
-                  
+
                   const Divider(),
                   ListTile(
                     leading: const Icon(FluentIcons.sign_out_24_regular),

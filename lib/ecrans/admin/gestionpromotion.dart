@@ -70,14 +70,14 @@ class _GestionPromotionPageState extends State<GestionPromotionPage> {
   }
 
   void _startRealTimeSubscription() {
-    final onUpdate = (List<Promotion> promotions) {
+    void onUpdate(List<Promotion> promotions) {
       if (mounted) {
         setState(() {
           _promotions = promotions;
           _isLoading = false;
         });
       }
-    };
+    }
 
     if (widget.cote == 'gauche') {
       _promotionService.startRealTimeSubscriptionGauche(onUpdate);
@@ -405,7 +405,7 @@ class _GestionPromotionPageState extends State<GestionPromotionPage> {
                           Switch(
                             value: promotion.active,
                             onChanged: (value) => _togglePromotionActive(promotion),
-                            activeColor: _couleurPrincipale,
+                            activeThumbColor: _couleurPrincipale,
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),

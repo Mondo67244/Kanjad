@@ -98,246 +98,243 @@ class RecentsState extends State<Recents>
         elevation: 4,
         child: const Icon(Icons.search, color: Colors.white),
       ),
-      body: Stack(
-        children: [
-          NestedScrollView(
-            headerSliverBuilder:
-                (context, innerBoxIsScrolled) => [
-                  SliverAppBar(
-                    automaticallyImplyLeading: false,
-                    expandedHeight: 100,
-                    floating: false,
-                    pinned: true,
-                    backgroundColor: Styles.rouge,
-                    elevation: 0,
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Styles.rouge,
-                              Styles.rouge.withOpacity(0.8),
-                            ],
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Logo et titre
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Text(
-                                    'Articles Récents',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 55),
-                          ],
-                        ),
+      body: NestedScrollView(
+        headerSliverBuilder:
+            (context, innerBoxIsScrolled) => [
+              SliverAppBar(
+                automaticallyImplyLeading: false,
+                expandedHeight: 100,
+                floating: true,
+                pinned: false,
+                snap: true,
+                backgroundColor: Styles.rouge,
+                elevation: 0,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Styles.rouge,
+                          Styles.rouge.withOpacity(0.8),
+                        ],
                       ),
                     ),
-                    bottom: PreferredSize(
-                      preferredSize: const Size.fromHeight(60),
-                      child: Container(
-                        height: 60,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(20),
-                          ),
-                        ),
-                        child: Row(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Logo et titre
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Bouton d'actualisation
-                            IconButton(
-                              onPressed: _refreshData,
-                              icon: Icon(Icons.refresh, color: Styles.rouge),
-                              tooltip: 'Actualiser',
-                            ),
-                            // Titre de la section
-                            const Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16),
-                                child: Text(
-                                  'Découvrez nos produits récents',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
-                                  ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Text(
+                                'Articles Récents',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ),
+                        const SizedBox(height: 55),
+                      ],
                     ),
                   ),
-                ],
-            body: RefreshIndicator(
-              onRefresh: _refreshData,
-              color: Styles.rouge,
-              backgroundColor: Colors.white,
-              strokeWidth: 3,
-              child: Consumer2<ProductProvider, PanierProvider>(
-                builder: (context, productProvider, panierProvider, child) {
-                  if (productProvider.isLoading &&
-                      productProvider.products.isEmpty) {
-                    return FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: const Center(
-                        child: CircularProgressIndicator(color: Styles.rouge),
+                ),
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(60),
+                  child: Container(
+                    height: 60,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
                       ),
-                    );
-                  }
-
-                  if (productProvider.error != null) {
-                    return FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              size: 64,
-                              color: Styles.erreur,
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Erreur de chargement',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              productProvider.error!,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton.icon(
-                              onPressed: _refreshData,
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('Réessayer'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Styles.rouge,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 12,
-                                ),
-                              ),
-                            ),
-                          ],
+                    ),
+                    child: Row(
+                      children: [
+                        // Bouton d'actualisation
+                        IconButton(
+                          onPressed: _refreshData,
+                          icon: Icon(Icons.refresh, color: Styles.rouge),
+                          tooltip: 'Actualiser',
                         ),
+                        // Titre de la section
+                        const Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              'Découvrez nos produits récents',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+        body: RefreshIndicator(
+          onRefresh: _refreshData,
+          color: Styles.rouge,
+          backgroundColor: Colors.white,
+          strokeWidth: 3,
+          child: Consumer2<ProductProvider, PanierProvider>(
+            builder: (context, productProvider, panierProvider, child) {
+              if (productProvider.isLoading &&
+                  productProvider.products.isEmpty) {
+                return FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: const Center(
+                    child: CircularProgressIndicator(color: Styles.rouge),
+                  ),
+                );
+              }
+
+              if (productProvider.error != null) {
+                return FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Styles.erreur,
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Erreur de chargement',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          productProvider.error!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: _refreshData,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Réessayer'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Styles.rouge,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final screenWidth = constraints.maxWidth;
+                  if (screenWidth > 1300) {
+                    // Layout large écran avec sidebar
+                    return Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(
+                              16,
+                              20,
+                              8,
+                              20,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: DynamicPromotionImages(
+                                cote: 'gauche',
+                                promotionService: PromotionService(),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 5,
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              maxWidth: 1200,
+                            ),
+                            child: FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: _buildModernContent(
+                                productProvider.products,
+                                panierProvider.idsPanier,
+                                isWideScreen: true,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(
+                              8,
+                              20,
+                              16,
+                              20,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: DynamicPromotionImages(
+                                cote: 'droite',
+                                promotionService: PromotionService(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    // Layout mobile/tablet
+                    return FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: _buildModernContent(
+                        productProvider.products,
+                        panierProvider.idsPanier,
+                        isWideScreen: screenWidth > 550,
                       ),
                     );
                   }
-
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      final screenWidth = constraints.maxWidth;
-                      if (screenWidth > 1300) {
-                        // Layout large écran avec sidebar
-                        return Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  20,
-                                  8,
-                                  20,
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: DynamicPromotionImages(
-                                    cote: 'gauche',
-                                    promotionService: PromotionService(),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 5,
-                              child: Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 1200,
-                                ),
-                                child: FadeTransition(
-                                  opacity: _fadeAnimation,
-                                  child: _buildModernContent(
-                                    productProvider.products,
-                                    panierProvider.idsPanier,
-                                    isWideScreen: true,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  8,
-                                  20,
-                                  16,
-                                  20,
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: DynamicPromotionImages(
-                                    cote: 'droite',
-                                    promotionService: PromotionService(),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      } else {
-                        // Layout mobile/tablet
-                        return FadeTransition(
-                          opacity: _fadeAnimation,
-                          child: _buildModernContent(
-                            productProvider.products,
-                            panierProvider.idsPanier,
-                            isWideScreen: screenWidth > 550,
-                          ),
-                        );
-                      }
-                    },
-                  );
                 },
-              ),
-            ),
+              );
+            },
           ),
-        ],
+        ),
       ),
     );
   }
