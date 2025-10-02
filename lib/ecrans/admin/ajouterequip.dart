@@ -243,7 +243,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
     }
   }
 
-  void _removeImage(int index) {
+  void _retirerImage(int index) {
     setState(() => _imageFiles.removeAt(index));
   }
   
@@ -359,7 +359,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
                 currentStep: _currentStep,
                 onStepTapped: (step) => setState(() => _currentStep = step),
                 onStepContinue: () {
-                  if (_validateCurrentStep()) {
+                  if (_valideEtape()) {
                     if (_currentStep < 3) {
                       setState(() => _currentStep += 1);
                     } else {
@@ -372,7 +372,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
                     setState(() => _currentStep -= 1);
                   }
                 },
-                steps: _buildSteps(),
+                steps: _etapes(),
                 controlsBuilder: (context, details) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 24.0),
@@ -408,29 +408,29 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
     );
   }
 
-  List<Step> _buildSteps() {
+  List<Step> _etapes() {
     return [
       Step(
         title: const Text('Infos'),
-        content: _buildStepInformations(),
+        content: _infosEtape(),
         isActive: _currentStep >= 0,
         state: _currentStep > 0 ? StepState.complete : StepState.indexed,
       ),
       Step(
         title: const Text('Catégorie'),
-        content: _buildStepCategorisation(),
+        content: _etapeCategorie(),
         isActive: _currentStep >= 1,
         state: _currentStep > 1 ? StepState.complete : StepState.indexed,
       ),
       Step(
         title: const Text('Médias'),
-        content: _buildStepMedias(),
+        content: _ajoutMedias(),
         isActive: _currentStep >= 2,
         state: _currentStep > 2 ? StepState.complete : StepState.indexed,
       ),
       Step(
         title: const Text('Options'),
-        content: _buildStepOptions(),
+        content: _optionDetapes(),
         isActive: _currentStep >= 3,
         state: _currentStep > 3 ? StepState.complete : StepState.indexed,
       ),
@@ -439,12 +439,12 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
 
   // --- STEP WIDGETS ---
 
-  Widget _buildStepInformations() {
+  Widget _infosEtape() {
     return Column(
       children: [
-        _buildTextField(controller: _nomController, label: 'Nom du produit', validator: _validateRequired),
+        _zoneTexte(controller: _nomController, label: 'Nom du produit', validator: _validateRequired),
         const SizedBox(height: 16),
-        _buildDropdown(
+        _listeDeroulante(
           value: _selectedBrand,
           items: _brands,
           label: 'Marque',
@@ -455,19 +455,19 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(child: _buildTextField(controller: _modeleController, label: 'Modèle / Référence', validator: _validateRequired)),
+            Expanded(child: _zoneTexte(controller: _modeleController, label: 'Modèle / Référence', validator: _validateRequired)),
             const SizedBox(width: 16),
-            Expanded(child: _buildTextField(controller: _quantiteController, label: 'Quantité', keyboardType: TextInputType.number, validator: _validateInteger)),
+            Expanded(child: _zoneTexte(controller: _quantiteController, label: 'Quantité', keyboardType: TextInputType.number, validator: _validateInteger)),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildStepCategorisation() {
+  Widget _etapeCategorie() {
     return Column(
       children: [
-        _buildDropdown(
+        _listeDeroulante(
           value: _selectedCategory,
           items: _categories,
           label: 'Catégorie principale',
@@ -480,7 +480,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
         ),
         if (_selectedCategory != null) ...[
           const SizedBox(height: 16),
-          _buildDropdown(
+          _listeDeroulante(
             value: _selectedSousCat,
             items: _categoryTypes[_selectedCategory] ?? [],
             label: 'Sous-catégorie',
@@ -493,7 +493,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
         ],
         if (_selectedSousCat != null) ...[
           const SizedBox(height: 16),
-          _buildDropdown(
+          _listeDeroulante(
             value: _selectedType,
             items: _typeAppareil[_selectedSousCat] ?? [],
             label: 'Type d\'appareil',
@@ -502,9 +502,9 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
           ),
         ],
         const SizedBox(height: 24),
-        _buildSectionTitle('Tarification'),
+        _sectionTitre('Tarification'),
         const SizedBox(height: 16),
-        _buildTextField(controller: _prixController, label: 'Prix de vente (CFA)', keyboardType: TextInputType.number, validator: _validateDouble),
+        _zoneTexte(controller: _prixController, label: 'Prix de vente (CFA)', keyboardType: TextInputType.number, validator: _validateDouble),
         SwitchListTile.adaptive(
           contentPadding: EdgeInsets.zero,
           title: const Text('Mettre en promotion ?'),
@@ -513,39 +513,39 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
           activeColor: Styles.rouge,
         ),
         if (enPromo)
-          _buildTextField(controller: _ancientPrixController, label: 'Ancien Prix (barré)', keyboardType: TextInputType.number, validator: _validateDouble),
+          _zoneTexte(controller: _ancientPrixController, label: 'Ancien Prix (barré)', keyboardType: TextInputType.number, validator: _validateDouble),
       ],
     );
   }
 
-  Widget _buildStepMedias() {
+  Widget _ajoutMedias() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Images du produit (3 max)'),
+        _sectionTitre('Images du produit (3 max)'),
         const SizedBox(height: 16),
         Wrap(
           spacing: 12,
           runSpacing: 12,
           children: [
-            ..._imageFiles.asMap().entries.map((entry) => _buildImagePreview(entry.value, entry.key)),
+            ..._imageFiles.asMap().entries.map((entry) => _apercuImage(entry.value, entry.key)),
             if (_imageFiles.length < 3) _buildImagePickerButton(),
           ],
         ),
         const SizedBox(height: 24),
-        _buildSectionTitle('Description'),
+        _sectionTitre('Description'),
         const SizedBox(height: 16),
-        _buildTextField(controller: _descriptionBreveController, label: 'Description courte (accroche)', maxLines: 2, validator: _validateRequired),
+        _zoneTexte(controller: _descriptionBreveController, label: 'Description courte (accroche)', maxLines: 2, validator: _validateRequired),
         const SizedBox(height: 16),
-        _buildTextField(controller: _descriptionController, label: 'Description complète', maxLines: 5, validator: _validateRequired),
+        _zoneTexte(controller: _descriptionController, label: 'Description complète', maxLines: 5, validator: _validateRequired),
       ],
     );
   }
 
-  Widget _buildStepOptions() {
+  Widget _optionDetapes() {
     return Column(
       children: [
-        _buildSectionTitle('Logistique'),
+        _sectionTitre('Logistique'),
         SwitchListTile.adaptive(
           title: const Text('Ce produit est-il livrable ?'),
           subtitle: const Text('Désactivez pour un retrait en magasin uniquement.'),
@@ -554,7 +554,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
           activeColor: Styles.bleu,
         ),
         const SizedBox(height: 16),
-        _buildSectionTitle('Paiement'),
+        _sectionTitre('Paiement'),
         SwitchListTile.adaptive(
           title: const Text('Accepter le paiement mobile'),
           subtitle: const Text('(Orange Money, MTN, etc.)'),
@@ -573,9 +573,9 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
     );
   }
   
-  // --- HELPER WIDGETS ---
+  //Widgets
 
-  Widget _buildTextField({required TextEditingController controller, required String label, int maxLines = 1, TextInputType keyboardType = TextInputType.text, String? Function(String?)? validator,}) {
+  Widget _zoneTexte({required TextEditingController controller, required String label, int maxLines = 1, TextInputType keyboardType = TextInputType.text, String? Function(String?)? validator,}) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
@@ -591,7 +591,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
     );
   }
 
-  Widget _buildDropdown({required String? value, required List<String> items, required String label, required void Function(String?) onChanged, String? Function(String?)? validator,}) {
+  Widget _listeDeroulante({required String? value, required List<String> items, required String label, required void Function(String?) onChanged, String? Function(String?)? validator,}) {
     return DropdownButtonFormField<String>(
       initialValue: value,
       items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
@@ -608,7 +608,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _sectionTitre(String title) {
     return Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87));
   }
 
@@ -616,7 +616,6 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
     return GestureDetector(
       onTap: _pickImage,
       child: DottedBorder(
-        
         child: const SizedBox(
           width: 100,
           height: 100,
@@ -633,7 +632,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
     );
   }
 
-  Widget _buildImagePreview(XFile file, int index) {
+  Widget _apercuImage(XFile file, int index) {
     return SizedBox(
       width: 100,
       height: 100,
@@ -650,7 +649,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
             top: -10,
             right: -10,
             child: InkWell(
-              onTap: () => _removeImage(index),
+              onTap: () => _retirerImage(index),
               child: const CircleAvatar(
                 radius: 14,
                 backgroundColor: Colors.red,
@@ -664,22 +663,22 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
   }
 
   // --- STEP VALIDATION ---
-  bool _validateCurrentStep() {
+  bool _valideEtape() {
     switch (_currentStep) {
       case 0: // Étape "Infos"
-        return _validateStepInformations();
+        return _valideInfos();
       case 1: // Étape "Catégorie"
-        return _validateStepCategorisation();
+        return _valideCategories();
       case 2: // Étape "Médias"
-        return _validateStepMedias();
+        return _valideMedia();
       case 3: // Étape "Options"
-        return _validateStepOptions();
+        return _valideOptions();
       default:
         return true;
     }
   }
 
-  bool _validateStepInformations() {
+  bool _valideInfos() {
     if (_nomController.text.trim().isEmpty) {
       MessagerieService.showError(context, 'Le nom du produit est obligatoire');
       return false;
@@ -704,7 +703,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
     return true;
   }
 
-  bool _validateStepCategorisation() {
+  bool _valideCategories() {
     if (_selectedCategory == null || _selectedCategory!.trim().isEmpty) {
       MessagerieService.showError(context, 'La catégorie est obligatoire');
       return false;
@@ -744,7 +743,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
     return true;
   }
 
-  bool _validateStepMedias() {
+  bool _valideMedia() {
     if (!_estModeEdition && _imageFiles.isEmpty) {
       MessagerieService.showError(context, 'Veuillez sélectionner au moins une image');
       return false;
@@ -768,7 +767,7 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
     return true;
   }
 
-  bool _validateStepOptions() {
+  bool _valideOptions() {
     // Cette étape n'a pas de validation spécifique requise
     // Tous les champs sont optionnels (switches)
     return true;

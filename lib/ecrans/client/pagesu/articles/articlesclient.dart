@@ -25,7 +25,7 @@ class RecentsState extends State<Recents>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
-  final Map<String, int> _produits = {};
+  // final Map<String, int> _produits = {};
 
   @override
   void initState() {
@@ -43,6 +43,7 @@ class RecentsState extends State<Recents>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final productProvider = Provider.of<ProductProvider>(context, listen: false);
       if (!productProvider.isLoaded) {
+        //Rafraichir les donnees
         _refreshData();
       }
     });
@@ -54,11 +55,11 @@ class RecentsState extends State<Recents>
     super.dispose();
   }
 
-  void _onLoadMore(String category) {
-    setState(() {
-      _produits[category] = (_produits[category] ?? 5) + 2;
-    });
-  }
+  // void _onLoadMore(String category) {
+  //   setState(() {
+  //     _produits[category] = (_produits[category] ?? 5) + 2;
+  //   });
+  // }
 
   Future<void> _toggleAuPanier(Produit produit) async {
     final panierProvider = Provider.of<PanierProvider>(context, listen: false);
