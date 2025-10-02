@@ -5,6 +5,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:kanjad/utilitaires/servicemessagerie.dart';
 import 'package:kanjad/widgets/kanjadappbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:kanjad/services/BD/notification_service.dart';
 
 class Accueila extends StatefulWidget {
   const Accueila({super.key});
@@ -15,6 +16,28 @@ class Accueila extends StatefulWidget {
 
 class _AccueilaState extends State<Accueila> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _nombreNotificationsNonLues = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _chargerNombreNotifications();
+  }
+
+  Future<void> _chargerNombreNotifications() async {
+    try {
+      final notifications = await NotificationService.instance.recupererNotifications(
+        statut: 'non_lu',
+      );
+      if (mounted) {
+        setState(() {
+          _nombreNotificationsNonLues = notifications.length;
+        });
+      }
+    } catch (e) {
+      debugPrint('Erreur lors du chargement des notifications: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,6 +194,13 @@ class _AccueilaState extends State<Accueila> {
   Widget _construireGrilleActions() {
     final actions = [
       {
+        'route': '/admin/notifications',
+        'icon': FluentIcons.alert_24_filled,
+        'text': 'Notifications',
+        'color': Styles.rouge,
+        'badge': _nombreNotificationsNonLues,
+      },
+      {
         'route': '/admin/ajouterequip',
         'icon': FluentIcons.add_circle_24_filled,
         'text': 'Ajouter un Produit',
@@ -243,10 +273,17 @@ class _AccueilaState extends State<Accueila> {
         (context, index) {
           final action = actions[index];
           return _construireCarteAction(
-            auClic: () => Navigator.pushNamed(context, action['route'] as String),
+            auClic: () {
+              Navigator.pushNamed(context, action['route'] as String).then((_) {
+                if (action['text'] == 'Notifications') {
+                  _chargerNombreNotifications();
+                }
+              });
+            },
             icone: action['icon'] as IconData,
             texte: action['text'] as String,
             couleur: action['color'] as Color,
+            badge: action['badge'] as int?,
           );
         },
         childCount: actions.length,
@@ -260,6 +297,7 @@ class _AccueilaState extends State<Accueila> {
     required IconData icone,
     required String texte,
     required Color couleur,
+    int? badge,
   }) {
     return Card(
       color: Styles.blanc,
@@ -271,10 +309,34 @@ class _AccueilaState extends State<Accueila> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
-              radius: 30,
-              backgroundColor: couleur.withValues(alpha: 0.15),
-              child: Icon(icone, size: 32, color: couleur),
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: couleur.withOpacity(0.15),
+                  child: Icon(icone, size: 32, color: couleur),
+                ),
+                if (badge != null && badge > 0)
+                  Positioned(
+                    right: -5,
+                    top: -5,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Styles.rouge,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        badge > 99 ? '99+' : badge.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 16),
             Padding(

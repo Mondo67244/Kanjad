@@ -71,8 +71,9 @@ class _SouhaitsPageState extends State<SouhaitsPage>
               SliverAppBar(
                 automaticallyImplyLeading: false,
                 expandedHeight: 100,
-                floating: false,
-                pinned: true,
+                floating: true,
+                pinned: false,
+                snap: true,
                 backgroundColor: Styles.rouge,
                 elevation: 0,
                 flexibleSpace: FlexibleSpaceBar(
@@ -781,6 +782,7 @@ class _SouhaitsPageState extends State<SouhaitsPage>
               itemBuilder: (context, index) {
                 final produit = suggestions[index];
                 return Container(
+                  key: ValueKey(produit.idproduit),
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
                     color: Colors.white,

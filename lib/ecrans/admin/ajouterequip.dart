@@ -2,16 +2,13 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kanjad/basicdata/produit.dart';
 import 'package:kanjad/basicdata/style.dart';
 import 'package:kanjad/utilitaires/servicemessagerie.dart';
-import 'package:kanjad/basicdata/style.dart';
-import 'package:kanjad/services/BD/supabase.dart';
-import 'package:kanjad/utilitaires/servicemessagerie.dart';
 import 'package:kanjad/widgets/kanjadappbar.dart';
 import 'package:kanjad/widgets/indicateurdetats.dart';
+import 'package:kanjad/services/BD/supabase.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
@@ -261,88 +258,152 @@ class _AjouterEquipPageState extends State<AjouterEquipPage> {
         MessagerieService.showError(context, 'Veuillez sélectionner au moins une image.');
         return;
     }
-    
+
     setState(() => _isLoading = true);
 
     try {
-        // ... [ YOUR EXISTING _submitForm LOGIC REMAINS UNCHANGED ] ...
-        // I will just put a placeholder here for brevity
-        await Future.delayed(const Duration(seconds: 2)); 
-        if(mounted) {
-            MessagerieService.showSuccess(context, 'Produit ${_estModeEdition ? 'modifié' : 'ajouté'} avec succès!');
-            Navigator.pop(context);
+      // 1. Générer l'ID du produit (nouveau produit seulement)
+      String produitId;
+      if (_estModeEdition) {
+        produitId = _produitAEditer!.idproduit;
+      } else {
+        produitId = await SupabaseService.instance.generateProduitId(_selectedType!);
+      }
+
+      // 2. Uploader les images si elles existent
+      List<String> imageUrls = [];
+      if (_imageFiles.isNotEmpty) {
+        for (int i = 0; i < _imageFiles.length; i++) {
+          final imageUrl = await SupabaseService.instance.uploadImage(
+            _imageFiles[i],
+            _selectedCategory!,
+            _nomController.text,
+            i,
+          );
+          imageUrls.add(imageUrl);
         }
+      }
+
+      // 3. Créer l'objet Produit
+      final produit = Produit(
+        idproduit: produitId,
+        nomproduit: _nomController.text.trim(),
+        description: _descriptionController.text,
+        descriptioncourte: _descriptionBreveController.text,
+        marque: _selectedBrand == '- Autre -' ? _marqueController.text.trim() : _selectedBrand!,
+        modele: _modeleController.text.trim(),
+        prix: double.parse(_prixController.text.trim()),
+        ancientprix: enPromo ? double.parse(_ancientPrixController.text.trim()) : 0.0,
+        quantite: int.parse(_quantiteController.text.trim()),
+        categorie: _selectedCategory!,
+        souscategorie: _selectedSousCat!,
+        type: _selectedType!,
+        livrable: estLivrable,
+        cash: paiementCash,
+        electronique: paiementElectronique,
+        enpromo: enPromo,
+        jeveut: false, // Nouveau produit, pas encore souhaité
+        aupanier: false, // Nouveau produit, pas encore dans le panier
+        enstock: int.parse(_quantiteController.text.trim()) > 0, // En stock si quantité > 0
+        createdAt: _estModeEdition ? _produitAEditer!.createdAt : DateTime.now(),
+        methodelivraison: estLivrable ? 'Livraison à domicile' : 'Retrait en boutique',
+        img1: imageUrls.isNotEmpty ? imageUrls[0] : (_estModeEdition ? _produitAEditer!.img1 : ''),
+        img2: imageUrls.length > 1 ? imageUrls[1] : (_estModeEdition ? _produitAEditer!.img2 : ''),
+        img3: imageUrls.length > 2 ? imageUrls[2] : (_estModeEdition ? _produitAEditer!.img3 : ''),
+        vues: _estModeEdition ? _produitAEditer!.vues : 0,
+      );
+
+      // 4. Sauvegarder en base
+      if (_estModeEdition) {
+        await SupabaseService.instance.updateProduit(produit);
+      } else {
+        await SupabaseService.instance.createProduit(produit);
+      }
+
+      if (mounted) {
+        MessagerieService.showSuccess(context, 'Produit ${_estModeEdition ? 'modifié' : 'ajouté'} avec succès!');
+        Navigator.pop(context);
+      }
     } catch (e) {
-        if (mounted) {
-          MessagerieService.showError(context, 'Erreur: ${e.toString()}');
-        }
+      if (mounted) {
+        MessagerieService.showError(context, 'Erreur: ${e.toString()}');
+      }
     } finally {
-        if(mounted) {
-            setState(() => _isLoading = false);
-        }
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
 
-  // --- UI BUILD METHODS ---
+  // Methode de build graphique
   @override
   Widget build(BuildContext context) {
+    final isWideScreen = MediaQuery.of(context).size.width > 600;
     return Scaffold(
+      
       appBar: KanjadAppBar(
         title: 'Kanjad',
         subtitle: _estModeEdition ? 'Modifier un Produit' : 'Nouveau Produit',
       ),
-      body: Form(
-        key: _formKey,
-        child: LayoutBuilder(builder: (context, constraints) {
-          return Stepper(
-            type: constraints.maxWidth > 600 ? StepperType.horizontal : StepperType.vertical,
-            currentStep: _currentStep,
-            onStepTapped: (step) => setState(() => _currentStep = step),
-            onStepContinue: () {
-              if (_validateCurrentStep()) {
-                if (_currentStep < 3) {
-                  setState(() => _currentStep += 1);
-                } else {
-                  _submitForm();
-                }
-              }
-            },
-            onStepCancel: () {
-              if (_currentStep > 0) {
-                setState(() => _currentStep -= 1);
-              }
-            },
-            steps: _buildSteps(),
-            controlsBuilder: (context, details) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 24.0),
-                child: _isLoading
-                    ? const Center(child: LoadingIndicator())
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (_currentStep > 0)
-                            TextButton(
-                              onPressed: details.onStepCancel,
-                              child: const Text('Précédent'),
-                            ),
-                          const SizedBox(width: 12),
-                          ElevatedButton(
-                            onPressed: details.onStepContinue,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Styles.bleu,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            ),
-                            child: Text(_currentStep == 3 ? 'Enregistrer' : 'Suivant'),
+      body: Center(
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: isWideScreen ? 500 : 400,
+          ),
+          child: Form(
+            key: _formKey,
+            child: LayoutBuilder(builder: (context, constraints) {
+              return Stepper(
+                type: constraints.maxWidth > 600 ? StepperType.horizontal : StepperType.vertical,
+                currentStep: _currentStep,
+                onStepTapped: (step) => setState(() => _currentStep = step),
+                onStepContinue: () {
+                  if (_validateCurrentStep()) {
+                    if (_currentStep < 3) {
+                      setState(() => _currentStep += 1);
+                    } else {
+                      _submitForm();
+                    }
+                  }
+                },
+                onStepCancel: () {
+                  if (_currentStep > 0) {
+                    setState(() => _currentStep -= 1);
+                  }
+                },
+                steps: _buildSteps(),
+                controlsBuilder: (context, details) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 24.0),
+                    child: _isLoading
+                        ? const Center(child: LoadingIndicator())
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              if (_currentStep > 0)
+                                TextButton(
+                                  onPressed: details.onStepCancel,
+                                  child: const Text('Précédent'),
+                                ),
+                              const SizedBox(width: 12),
+                              ElevatedButton(
+                                onPressed: details.onStepContinue,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Styles.bleu,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                ),
+                                child: Text(_currentStep == 3 ? 'Enregistrer' : 'Suivant'),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                  );
+                },
               );
-            },
-          );
-        }),
+            }),
+          ),
+        ),
       ),
     );
   }

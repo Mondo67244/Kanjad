@@ -168,19 +168,27 @@ class _GestionStockPageState extends State<GestionStockPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isWideScreen = MediaQuery.of(context).size.width > 600;
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: _buildAppBar(),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Column(
-            children: [
-              _buildMetricsSection(constraints),
-              _buildFiltersSection(constraints),
-              Expanded(child: _buildProductList(constraints)),
-            ],
-          );
-        },
+      body: Center(
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: isWideScreen ? 850 : 400,
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Column(
+                children: [
+                  _buildMetricsSection(constraints),
+                  _buildFiltersSection(constraints),
+                  Expanded(child: _buildProductList(constraints)),
+                ],
+              );
+            },
+          ),
+        ),
       ),
       floatingActionButton: _buildFloatingActionButton(),
     );

@@ -153,8 +153,9 @@ class _PanierState extends State<Panier>
               SliverAppBar(
                 automaticallyImplyLeading: false,
                 expandedHeight: 100,
-                floating: false,
-                pinned: true,
+                floating: true,
+                pinned: false,
+                snap: true,
                 backgroundColor: Styles.rouge,
                 elevation: 0,
                 flexibleSpace: FlexibleSpaceBar(
@@ -1322,6 +1323,7 @@ class _SuggestionsPanier extends StatelessWidget {
             itemBuilder: (context, index) {
               final produit = suggestions[index];
               return ProduitSuggestionCard(
+                key: ValueKey(produit.idproduit),
                 produit: produit,
                 isActionDone: panierProvider.isProduitInPanier(
                   produit.idproduit,

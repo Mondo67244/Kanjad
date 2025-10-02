@@ -35,6 +35,7 @@ import 'package:kanjad/ecrans/client/pagesu/principales/inscriptionphase1.dart';
 import 'package:kanjad/ecrans/client/pagesu/principales/ecrandemarrage.dart';
 import 'package:kanjad/ecrans/client/pagesu/parametres/parametres.dart';
 import 'package:kanjad/ecrans/commercial/formecommercial.dart';
+import 'package:kanjad/ecrans/admin/notifications.dart';
 import 'package:kanjad/ecrans/client/pagesu/parametres/pagediscussion.dart';
 import 'package:kanjad/services/BD/configsupabase.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -167,6 +168,8 @@ class MyApp extends StatelessWidget {
             (context) => const ProtectionAdmin(child: CommercialDashboard()),
         '/admin/gestion_stock':
             (context) => const ProtectionAdmin(child: GestionStockPage()),
+        '/admin/notifications':
+            (context) => const ProtectionAdmin(child: PageNotifications()),
         '/utilisateur/commandes': (context) => const CommandesPage(),
         '/utilisateur/parametres': (context) => const ParametresPage(),
         '/utilisateur/parametres/discussions':

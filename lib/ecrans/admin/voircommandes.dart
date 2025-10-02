@@ -81,6 +81,13 @@ class _VoirCommandesPageState extends State<VoirCommandesPage> {
                               .toList();
                     }
 
+                    // Sort by most recent date first (descending order)
+                    commandes.sort((a, b) {
+                      final dateA = DateTime.parse(a.datecommande);
+                      final dateB = DateTime.parse(b.datecommande);
+                      return dateB.compareTo(dateA); // Most recent first
+                    });
+
                     if (commandes.isEmpty) {
                       return const EmptyStateWidget(
                         message: 'Aucune commande dans cette catégorie.',
@@ -116,7 +123,6 @@ class _VoirCommandesPageState extends State<VoirCommandesPage> {
       'Validée',
       'Payé',
       'En cours de livraison',
-      'Livré',
       'Terminé',
     ];
     final grandEcran = MediaQuery.of(context).size.width > 600;

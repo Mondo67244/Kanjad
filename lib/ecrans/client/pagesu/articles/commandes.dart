@@ -522,8 +522,9 @@ class _CommandesPageState extends State<CommandesPage> {
                 SliverAppBar(
                   automaticallyImplyLeading: false,
                   expandedHeight: 100,
-                  floating: false,
-                  pinned: true,
+                  floating: true,
+                  pinned: false,
+                  snap: true,
                   backgroundColor: Styles.rouge,
                   elevation: 0,
                   flexibleSpace: FlexibleSpaceBar(
@@ -592,7 +593,7 @@ class _CommandesPageState extends State<CommandesPage> {
           body: Container(
             constraints:
                 isWideScreen
-                    ? BoxConstraints(maxWidth: 400)
+                    ? BoxConstraints(maxWidth: 300)
                     : BoxConstraints(maxWidth: 400),
             child: StreamBuilder<List<Commande>>(
               stream: _commandesStream,

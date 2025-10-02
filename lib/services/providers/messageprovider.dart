@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kanjad/basicdata/message.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:kanjad/services/BD/supabase.dart';
+import 'package:kanjad/services/BD/notification_service.dart';
 
 class MessageProvider with ChangeNotifier {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -307,6 +309,35 @@ class MessageProvider with ChangeNotifier {
         'idclient': role == 'client' ? currentUserId : clientId,
       };
       await _supabase.from('messages').insert(messageData);
+
+      // --- Integration de la notification ---
+      final expediteur = await SupabaseService.instance.getUtilisateur(currentUserId);
+      final nomExpediteur = '${expediteur?.prenomutilisateur ?? ''} ${expediteur?.nomutilisateur ?? ''}'.trim();
+
+      if (role == 'client') {
+        // Notifier tous les admins et commerciaux
+        final adminsAndCommercials = await _supabase
+            .from('utilisateurs')
+            .select('idutilisateur')
+            .filter('roleutilisateur', 'in', '("admin", "commercial")');
+        
+        for (final user in adminsAndCommercials) {
+          await NotificationService.instance.creerNotificationMessage(
+            user['idutilisateur'],
+            nomExpediteur.isEmpty ? 'Un client' : nomExpediteur,
+            content,
+          );
+        }
+      } else if (role == 'commercial' && clientId != null) {
+        // Notifier le client
+        await NotificationService.instance.creerNotificationMessage(
+          clientId,
+          nomExpediteur.isEmpty ? 'Support Kanjad' : nomExpediteur,
+          content,
+        );
+      }
+      // --- Fin de l'intégration ---
+
       return true;
     } catch (e) {
       _error = e.toString();

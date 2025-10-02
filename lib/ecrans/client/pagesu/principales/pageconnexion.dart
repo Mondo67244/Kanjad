@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:kanjad/basicdata/style.dart';
 import 'package:kanjad/services/BD/servicesynchronisation.dart';
 import 'package:kanjad/services/BD/authentification.dart';
+import 'package:kanjad/services/BD/notification_service.dart';
 
 class Pageconnexion extends StatefulWidget {
   const Pageconnexion({super.key});
@@ -64,6 +65,14 @@ class _PageconnexionState extends State<Pageconnexion> {
 
       final SynchronisationService syncService = SynchronisationService();
       await syncService.synchroniserTout();
+      
+      // Créer une notification de connexion
+      if (user.roleutilisateur != 'client') {
+        await NotificationService.instance.creerNotificationConnexion(
+          user.idutilisateur,
+          '${user.prenomutilisateur ?? ''} ${user.nomutilisateur ?? ''}'.trim(),
+        );
+      }
 
       if (mounted) {
         navigateBasedOnRole(context, user);

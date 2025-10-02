@@ -11,6 +11,7 @@ import 'package:kanjad/basicdata/utilisateur.dart';
 import 'package:kanjad/basicdata/commande.dart';
 import 'package:kanjad/basicdata/facture.dart';
 import 'package:kanjad/basicdata/produit.dart';
+import 'package:kanjad/services/BD/notification_service.dart';
 import 'dart:developer' as developer;
 
 class SupabaseService {
@@ -699,14 +700,27 @@ class SupabaseService {
         'Updating commande payment for ID: $commandeId',
         name: 'SupabaseService.updateCommandePaiement',
       );
-      await supabase
+      
+      // Mise à jour de la commande
+      final response = await supabase
           .from(commandesTable)
           .update({
             'statutpaiement': status,
             'methodepaiement': methodePaiement,
             'numeropaiement': numeroPaiement.isEmpty ? null : numeroPaiement,
           })
-          .eq('idcommande', commandeId);
+          .eq('idcommande', commandeId)
+          .select()
+          .single();
+
+      // Si le statut est "Payé", créer une notification
+      if (status == 'Payé') {
+        await NotificationService.instance.creerNotificationPaiement(
+          commandeId,
+          true, // succes
+        );
+      }
+
       developer.log(
         'Successfully updated commande payment for ID: $commandeId',
         name: 'SupabaseService.updateCommandePaiement',
@@ -889,7 +903,16 @@ class SupabaseService {
         'Adding commande: ${commande.idcommande}',
         name: 'SupabaseService.addCommande',
       );
-      await supabase.from(commandesTable).insert(commande.toMap());
+      
+      final result = await supabase.from(commandesTable).insert(commande.toMap()).select().single();
+      final idcommande = result['idcommande'] as String;
+
+      // Créer une notification pour la nouvelle commande
+      await NotificationService.instance.creerNotificationCommande(
+        idcommande,
+        commande.utilisateur.idutilisateur,
+      );
+      
       developer.log(
         'Successfully added commande: ${commande.idcommande}',
         name: 'SupabaseService.addCommande',
@@ -1595,10 +1618,28 @@ class SupabaseService {
 
   Future<void> majStatut(String commandeId, String newStatus) async {
     try {
+      // Récupérer les détails de la commande avant la mise à jour
+      final response = await supabase
+          .from(commandesTable)
+          .select()
+          .eq('idcommande', commandeId)
+          .single();
+
+      // Mise à jour du statut
       await supabase
           .from(commandesTable)
           .update({'statutpaiement': newStatus})
           .eq('idcommande', commandeId);
+
+      // Créer une notification si la commande est marquée comme livrée
+      if (newStatus == 'Livré') {
+        final commande = Commande.fromMap(response as Map<String, dynamic>);
+        await NotificationService.instance.creerNotificationLivraison(
+          commandeId,
+          commande.utilisateur.idutilisateur, // Notifier le client
+        );
+      }
+
       developer.log(
         'Successfully updated order status for ID: $commandeId to $newStatus',
         name: 'SupabaseService.majStatut',
@@ -1746,9 +1787,16 @@ class SupabaseService {
           .from(commandesTable)
           .update({'idlivreur': idlivreur, 'statutpaiement': 'En livraison'})
           .eq('idcommande', commandeId);
+
+      // Créer une notification pour le livreur
+      await NotificationService.instance.creerNotificationLivraison(
+        commandeId,
+        idlivreur,
+      );
+      
       developer.log(
-        'Successfully assigned livreur',
-        name: 'SupabaseService.assignLivreur',
+        'Successfully assigned livreur and created notification',
+        name: 'SupabaseService.assignLivreur', 
       );
     } catch (e, stackTrace) {
       developer.log(
@@ -1879,12 +1927,32 @@ class SupabaseService {
       for (final produitInCommande in commande.produits) {
         final String produitId = produitInCommande['idproduit'];
         final int quantiteVendue = produitInCommande['quantite'];
+        final String nomProduit = produitInCommande['nomproduit'];
+
+        // Récupérer la quantité actuelle avant la mise à jour
+        final response = await supabase
+            .from(produitsTable)
+            .select('quantite')
+            .eq('idproduit', produitId)
+            .single();
+            
+        final int quantiteActuelle = (response['quantite'] as num).toInt();
+        final int nouvelleQuantite = quantiteActuelle - quantiteVendue;
 
         // Appel d'une fonction RPC sur Supabase pour décrémenter la quantité
         await supabase.rpc('decrement_product_quantity', params: {
           'product_id_in': produitId,
           'quantity_in': quantiteVendue,
         });
+
+        // Créer une notification si le stock est bas
+        if (nouvelleQuantite <= 5) {
+          await NotificationService.instance.creerNotificationStock(
+            produitId, 
+            nomProduit,
+            nouvelleQuantite
+          );
+        }
       }
       developer.log(
         'Successfully decremented stock for order ID: ${commande.idcommande}',
