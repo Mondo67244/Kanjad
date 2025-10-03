@@ -1,0 +1,107 @@
+@startuml Activité - Workflow de Livraison
+!theme vibrant
+
+title Workflow de Livraison - Gestion des commandes
+
+start
+
+:Commande créée;
+
+if (Méthode paiement ?) then (Électronique)
+    :Attendre paiement Payé;
+    if (Paiement réussi ?) then (Oui)
+        :Statut = "Payé";
+    else (Non)
+        :Annuler commande;
+        stop
+    endif
+else (Cash à livraison)
+    :Statut = "En attente";
+    :Demander validation admin;
+    if (Admin valide ?) then (Oui)
+        :Statut = "Validée";
+    else (Non)
+        :Annuler commande;
+        stop
+    endif
+endif
+
+:Rechercher livreur disponible;
+
+if (Livreur trouvé ?) then (Oui)
+    :Assigner livreur;
+    :Notifier livreur;
+    :Statut = "En livraison";
+else (Non)
+    :Notifier admin manque livreur;
+    :Attendre attribution manuelle;
+
+    if (Attribution faite ?) then (Oui)
+        :Notifier livreur;
+        :Statut = "En livraison";
+    else (Non)
+        :Reporter livraison;
+        stop
+    endif
+endif
+
+:Livreur se rend chez client;
+
+if (Client disponible ?) then (Oui)
+    :Effectuer livraison;
+    :Marquer comme "Livré";
+    :Notifier client livraison effectuée;
+else (Non)
+    :rentrer avec le colis;
+endif
+
+:Client reçoit colis;
+
+if (Client valide réception ?) then (Oui)
+    :Confirmer commande;
+    :Statut = "Terminé";
+
+    if (Paiement cash ?) then (Oui)
+        :Collecter paiement;
+    endif
+
+    :Décrémenter stock;
+    :Générer facture;
+
+else (Non)
+    :Attendre confirmation auto;
+    if (Délai dépassé ?) then (Oui)
+        :Marquer comme "Terminé";
+        :Décrémenter stock;
+        :Générer facture;
+    endif
+endif
+
+if (Problème livraison ?) then (Oui)
+    :Signaler problème;
+    if (Résoluble ?) then (Oui)
+        :Résoudre problème;
+        :Retenter livraison;
+    else (Non)
+        :Annuler livraison partielle;
+        :Rembourser si nécessaire;
+        note right
+            Cas : produit défectueux,
+            client absent définitivement,
+            adresse invalide
+        end note
+    endif
+endif
+
+stop
+
+note right
+    **Conditions de passage de statut:**
+
+    **Critères qualité livraison:**
+    - Ponctualité (< 24h)
+    - État du colis
+    - Satisfaction client
+end note
+
+@enduml

@@ -1,0 +1,87 @@
+@startuml Séquence_Authentification_Utilisateur
+!theme vibrant
+title Processus d'Authentification - Connexion et Inscription
+
+actor "Utilisateur" as User
+participant "UI Écologique" as UI
+participant "AuthentificationService" as AuthService
+participant "SupabaseClient" as Supabase
+participant "SessionManager" as SessionMgr
+participant "RouteGuard" as RouteGuard
+
+== Connexion ==
+User -> UI: Cliquer "Se connecter"
+UI -> UI: Afficher formulaire
+User -> UI: Saisir email/password
+UI -> UI: Validation locale
+
+alt Formulaire valide
+    UI -> AuthService: signIn(email, password)
+    AuthService -> Supabase: signInWithPassword(email, password)
+    Supabase -> AuthService: Utilisateur + Token / Erreur
+
+    alt Authentification réussie
+        AuthService -> SessionMgr: créerSession(utilisateur)
+        SessionMgr -> SessionMgr: Stocker token/session
+        AuthService -> UI: Connexion réussie
+        UI -> RouteGuard: vérifierAccès(rôle)
+        RouteGuard -> UI: Rediriger selon rôle
+    else Échec connexion
+        AuthService -> UI: Erreur (mot de passe/email incorrect)
+    end
+end
+
+== Inscription ==
+User -> UI: Cliquer "S'inscrire"
+UI -> UI: Afficher formulaire inscription
+User -> UI: Saisir données
+UI -> UI: Validation formulaire
+
+alt Formulaire valide
+    UI -> AuthService: signUp(données)
+    AuthService -> Supabase: signUp(email, password, metadata)
+    Supabase -> AuthService: Confirmation / Erreur
+    alt Inscription réussie
+        AuthService -> Supabase: sendVerificationEmail()
+        Supabase -> User: Email vérification envoyé
+        AuthService -> UI: Inscription réussie
+    else Email déjà utilisé
+        AuthService -> UI: "Email déjà utilisé"
+    end
+end
+
+== Gestion Session ==
+SessionMgr -> SessionMgr: Écouter expiration token
+UI -> SessionMgr: getCurrentUser()
+
+alt Session valide
+    SessionMgr -> UI: Retour utilisateur
+    UI -> UI: Afficher interface connecté
+else Session expirée
+    SessionMgr -> Supabase: refreshToken()
+    Supabase -> SessionMgr: Nouveau token / Erreur
+    alt Refresh réussi
+        SessionMgr -> UI: Session renouvelée
+    else Refresh échoué
+        SessionMgr -> AuthService: logout()
+        AuthService -> Supabase: signOut()
+        SessionMgr -> UI: Redirection connexion
+    end
+end
+
+== Déconnexion ==
+User -> UI: Cliquer déconnexion
+UI -> AuthService: signOut()
+AuthService -> Supabase: signOut()
+AuthService -> SessionMgr: clearSession()
+SessionMgr -> SessionMgr: Supprimer données locales
+AuthService -> UI: Déconnexion terminée
+UI -> UI: Redirection écran connexion
+
+note right
+Sécurité implémentée :
+- Frontend : Validation formulaires, gestion session locale, route guards par rôle
+- Backend : Hashing mots de passe, JWT tokens, vérification email, audit connexions
+end note
+
+@enduml

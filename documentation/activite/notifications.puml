@@ -1,0 +1,109 @@
+@startuml Activité - Système de Notifications
+!theme vibrant
+
+title Système de Notifications - Gestion des événements
+
+start
+
+:Événement déclencheur;
+
+if (Type événement ?) then (Commande créée)
+    :Récupérer détails commande;
+    :Identifier destinataire (admin/commercial);
+    :Créer notification commande;
+    :Type = "commande";
+    :Priorité = "haute";
+
+else if (Type événement ?) then (Paiement effectué)
+    :Récupérer détails paiement;
+    :Notifier administrateur;
+    :Notifier client (confirmation);
+    :Type = "paiement";
+    :Priorité = "normale";
+
+else if (Type événement ?) then (Livraison assignée)
+    :Récupérer détails commande;
+    :Notifier livreur assigné;
+    :Notifier client (mise à jour);
+    :Type = "livraison";
+    :Priorité = "haute";
+
+else if (Type événement ?) then (Stock faible)
+    :Vérifier seuils stocks;
+    :Identifier produits concernés;
+    :Notifier administrateur;
+    :Type = "stock";
+    :Priorité = "critique";
+
+else  (Type événement ?) then (Message client)
+    :Récupérer contenu message;
+    :Notifier service commercial;
+    :Type = "message";
+    :Priorité = "normale";
+    note right
+        Message comprenant :
+        - Support client
+        - Réclamations
+        - Questions
+    end note
+    
+endif
+
+:Préparer contenu notification;
+
+if (Urgent ?) then (Oui)
+    :Ajouter alerte push;
+    :Marquer prioritaire;
+    if (Critique ?) then (Oui)
+        :Envoyer SMS/email immédiat;
+    endif
+else (Non)
+    :Notification standard;
+endif
+
+:Enregistrer dans base données;
+:Statut = "non_lu";
+
+partition "Traitement côté client" {
+    :Recevoir notification;
+
+    if (App ouverte ?) then (Oui)
+        :Actualiser interface;
+        :Montrer indicateur notification;
+        if (Son activé ?) then (Oui)
+            :Jouer son notification;
+        endif
+    else (Non)
+        :Afficher notification système;
+        :Badge icône application;
+    endif
+
+    if (Utilisateur clique ?) then (Oui)
+        :Marquer comme "lu";
+        :Naviguer vers contenu lié;
+        :Mettre à jour statistiques;
+    endif
+}
+
+:Nettoyer marquer les notifications lues;
+
+stop
+
+note right
+    **Types de notifications :**
+    - Commande : nouvelle commande
+    - Paiement : paiement validé/échoué
+    - Livraison : statut livraison
+    - Stock : alertes inventaire
+    - Message : contact client
+    - Système : erreurs techniques
+    - Connexion : sécurité compte
+
+    **Priorités :**
+    - Critique : action immédiate
+    - Haute : assez urgent
+    - Normale : information
+    - Basse : info générale
+end note
+
+@enduml

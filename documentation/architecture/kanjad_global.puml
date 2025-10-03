@@ -1,0 +1,153 @@
+@startuml Kanjar_Architecture_Global
+!theme vibrant
+title Architecture Globale - Application Kanjar E-commerce
+
+' --- Disposition horizontale ---
+left to right direction
+
+' =======================
+' FRONTEND (Flutter App)
+' =======================
+package "Frontend Flutter" as FLUTTER {
+
+    package "Interface Utilisateur (UI)" as UI {
+        package "Client" as CLIENT_UI {
+            [Page d'accueil]
+            [Recherche produits]
+            [Détails produit]
+            [Panier]
+            [Commandes]
+            [Paiement]
+            [Profil utilisateur]
+        }
+
+        package "Administrateur" as ADMIN_UI {
+            [Dashboard admin]
+            [Gestion produits]
+            [Gestion commandes]
+            [Gestion utilisateurs]
+            [Gestion promotions]
+            [Statistiques]
+        }
+
+        package "Livreur" as LIVREUR_UI {
+            [Dashboard livreur]
+            [Liste livraisons]
+            [Statistiques livreur]
+        }
+    }
+
+    package "Providers (State Management)" as PROVIDERS {
+        [ProductProvider]
+        [PanierProvider]
+        [SouhaitsProvider]
+        [MessageProvider]
+    }
+
+    package "Services Métier" as SERVICES {
+        [SupabaseService] as SUPABASE_SVC
+        [PanierService]
+        [SouhaitsService]
+        [NotificationService]
+        [CacheService]
+        [DistanceService]
+        [PromotionService]
+    }
+
+    package "Modèles & Utils" {
+        package "Modèles de données" as MODELS {
+            [Produit]
+            [Commande]
+            [Utilisateur]
+            [Facture]
+            [Notification]
+            [Promotion]
+        }
+
+        package "Widgets & Utilitaires" as WIDGETS_UTILS {
+            [Carte produit]
+            [App bar]
+            [Dialogues]
+            [Indicateurs]
+            [Gestion badges]
+            [Validation formulaires]
+            [Génération PDF]
+            [Messagerie]
+            [Thème global]
+        }
+    }
+}
+
+' =======================
+' BACKEND (Supabase)
+' =======================
+package "Backend Supabase" as BACKEND {
+
+    database "Base de données PostgreSQL" as DB {
+        [utilisateurs]
+        [produits]
+        [commandes]
+        [factures]
+        [notifications]
+        [panier]
+        [souhaits]
+        [promotions]
+        [messages]
+        [categories]
+    }
+
+    package "Stockage fichiers" as STORAGE {
+        [images_produits]
+        [images_accessoires]
+        [images_mobiles]
+        [images_reseau]
+        [images_bureautique]
+    }
+
+    package "Authentification" as AUTH {
+        [Gestion utilisateurs]
+        [Gestion rôles]
+        [Sécurité sessions]
+    }
+
+    package "Fonctions Edge" as FUNCTIONS {
+        [delete-user]
+        [notification-system]
+    }
+}
+
+' =======================
+' EXTERNAL SERVICES
+' =======================
+package "Services externes" as EXTERNAL {
+    [Paiement mobile (CinetPay)]
+    [Notifications push]
+    [Stockage images]
+    [Cache local (Hive)]
+}
+
+' =======================
+' RELATIONS
+' =======================
+UI --> PROVIDERS : "Consomme état"
+PROVIDERS --> SERVICES : "Appelle logique métier"
+UI --> SERVICES : "Actions directes"
+SERVICES --> DB : "CRUD"
+SUPABASE_SVC --> AUTH : "Auth"
+SUPABASE_SVC --> STORAGE : "Fichiers"
+BACKEND --> EXTERNAL : "Intégrations"
+
+WIDGETS_UTILS --> MODELS : "Affiche données"
+MODELS --> WIDGETS_UTILS : "Utilitaires"
+
+note left of UI
+    Interfaces adaptées selon le rôle
+    (Client / Admin / Livreur)
+end note
+
+note right of EXTERNAL
+    Services tiers pour paiement,
+    notifications et stockage
+end note
+
+@enduml

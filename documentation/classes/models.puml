@@ -1,0 +1,213 @@
+@startuml Diagrammes_Classes_Modèles_Kanjar
+!theme vibrant
+title Modèles de Données - Application Kanjar
+
+' Disposition horizontale
+left to right direction
+
+' =======================
+' PRODUITS ET CATALOGUE
+' =======================
+package "Catalogue & Promotions" {
+    class Produit {
+        +String idproduit
+        +String nomproduit
+        +String description
+        +String descriptioncourte
+        +double prix
+        +double ancientprix
+        +int vues
+        +String modele
+        +String marque
+        +String categorie
+        +String type
+        +String souscategorie
+        +bool jeveut
+        +bool aupanier
+        +String img1
+        +String img2
+        +String img3
+        +bool cash
+        +bool electronique
+        +bool enstock
+        +DateTime createdAt
+        +int quantite
+        +bool livrable
+        +bool enpromo
+        +String methodelivraison
+
+        +Map<String, dynamic> toMap()
+        +Produit.fromMap(Map<String, dynamic> map)
+        +Produit copyWith(...)
+    }
+
+    class Categorie {
+        +String idcategorie
+        +String nomcategorie
+        +String description
+        +String image
+        +bool active
+        +DateTime createdAt
+
+        +Map<String, dynamic> toMap()
+        +Categorie.fromMap(Map<String, dynamic> map)
+    }
+
+    class Promotion {
+        +String idpromotion
+        +String titre
+        +String description
+        +double pourcentage
+        +DateTime datedebut
+        +DateTime datefin
+        +List<String> produitsConcernes
+        +bool active
+
+        +Map<String, dynamic> toMap()
+        +Promotion.fromMap(Map<String, dynamic> map)
+    }
+}
+
+' =======================
+' UTILISATEURS ET MESSAGES
+' =======================
+package "Utilisateurs & Communication" {
+    class Utilisateur {
+        +String idutilisateur
+        +String? nomutilisateur
+        +String? prenomutilisateur
+        +String emailutilisateur
+        +String? numeroutilisateur
+        +String? villeutilisateur
+        +String roleutilisateur
+        +String? codepostal
+        +String? notecommande
+        +String? pays
+        +String? region
+        +String? addresse
+
+        +Map<String, dynamic> toMap()
+        +Utilisateur.fromMap(Map<String, dynamic> map)
+    }
+
+    class Message {
+        +String idmessage
+        +String contenu
+        +String expediteurId
+        +String destinataireId
+        +DateTime horodatage
+        +bool lu
+
+        +Map<String, dynamic> toMap()
+        +Message.fromMap(Map<String, dynamic> map)
+    }
+
+    class Notification {
+        +String idnotification
+        +String titre
+        +String message
+        +String type
+        +String priorite
+        +String statut
+        +String? idutilisateur
+        +String? idcommande
+        +String? idproduit
+        +Map<String, dynamic>? donneesSupplementaires
+        +DateTime datecreation
+        +DateTime? datelu
+
+        +Map<String, dynamic> toMap()
+        +Notification.fromMap(Map<String, dynamic> map)
+        +Notification copyWith(...)
+        +{static} List<String> getTypesDisponibles()
+        +{static} List<String> getPrioritesDisponibles()
+        +{static} List<String> getStatutsDisponibles()
+        +{static} Color getCouleurPriorite(String priorite)
+        +{static} IconData getIconeType(String type)
+        +bool estRecente()
+        +bool estUrgente()
+    }
+}
+
+' =======================
+' COMMANDES & FACTURES
+' =======================
+package "Commandes & Factures" {
+    class Commande {
+        +String idcommande
+        +String datecommande
+        +String notecommande
+        +String pays
+        +double prixcommande
+        +String ville
+        +String codepostal
+        +Utilisateur utilisateur
+        +List<Map<String, dynamic>> produits
+        +String methodepaiement
+        +String choixlivraison
+        +String numeropaiement
+        +String addresse
+        +String statutpaiement
+        +String? idlivreur
+
+        +Map<String, dynamic> toMap()
+        +Commande.fromMap(Map<String, dynamic> map)
+        +Commande copyWith(...)
+    }
+
+    class Facture {
+        +String idfacture
+        +String idcommande
+        +String datefacture
+        +Utilisateur utilisateur
+        +List<Produit> produits
+        +double prixfacture
+        +int quantite
+
+        +Map<String, dynamic> toMap()
+        +Facture.fromMap(Map<String, dynamic> map)
+    }
+}
+
+' =======================
+' RELATIONS ENTRE CLASSES
+' =======================
+Produit --> Commande : "appartient à 1..*"
+Produit --> Facture : "appartient à 1..*"
+Utilisateur --> Commande : "passe 0..*"
+Utilisateur --> Facture : "reçoit 0..*"
+Utilisateur --> Notification : "reçoit 0..*"
+Utilisateur --> Message : "envoie/reçoit 0..*"
+Commande --> Facture : "génère 1"
+Commande --> Notification : "génère 0..*"
+Commande --> Utilisateur : "livreur assigne (optionnel)"
+Promotion --> Produit : "s'applique à 0..*"
+
+note right of Produit
+    Classe principale représentant
+    les produits du catalogue.
+    Supporte plusieurs images
+    et méthodes de paiement.
+end note
+
+note right of Utilisateur
+    Gestion multi-rôles :
+    - client
+    - administrateur
+    - livreur
+    - commercial
+end note
+
+note right of Commande
+    Statuts possibles :
+    En attente, Validée,
+    En livraison, Livré, Payé
+end note
+
+note right of Notification
+    Système de notifications
+    pour différents types
+    d'événements avec priorité.
+end note
+
+@enduml

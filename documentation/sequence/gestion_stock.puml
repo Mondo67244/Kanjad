@@ -1,0 +1,154 @@
+@startuml Séquence - Gestion des Stocks
+!theme vibrant
+
+title Gestion des Stocks et Produits
+
+actor "Administrateur" as Admin
+participant "Interface\nGestion Stock" as UIStock
+participant "ProductProvider" as ProductProvider
+participant "SupabaseService" as SupabaseService
+participant "NotificationService" as NotifService
+participant "Base de Données" as DB
+participant "Stockage Images" as Storage
+
+== Ajout Nouveau Produit ==
+
+Admin -> UIStock: Cliquer "Ajouter produit"
+UIStock -> Admin: Afficher formulaire produit
+Admin -> UIStock: Saisir données produit + images
+
+UIStock -> UIStock: Validation données locales
+alt Données valides
+    UIStock -> SupabaseService: uploadImages(images)
+    SupabaseService -> Storage: Uploader images dans bucket approprié
+    Storage -> SupabaseService: URLs images générées
+    SupabaseService -> UIStock: URLs images reçues
+
+    UIStock -> SupabaseService: generateProduitId(type)
+    SupabaseService -> DB: SELECT max ID pour type
+    DB -> SupabaseService: IDs existants
+    SupabaseService -> UIStock: Nouvel ID généré
+
+    UIStock -> SupabaseService: createProduit(produitComplet)
+    SupabaseService -> DB: INSERT nouveau produit
+    DB -> SupabaseService: Produit créé
+    SupabaseService -> ProductProvider: Actualiser cache
+    ProductProvider -> DB: Rafraîchir données
+
+    SupabaseService -> UIStock: Produit ajouté avec succès
+    UIStock -> Admin: Confirmation succès + redirection
+
+else Données invalides
+    UIStock -> Admin: Afficher erreurs validation
+end
+
+== Modification Produit ==
+
+Admin -> UIStock: Sélectionner produit à modifier
+UIStock -> ProductProvider: getProduitById(id)
+ProductProvider -> DB: SELECT produit
+DB -> ProductProvider: Détails produit
+ProductProvider -> UIStock: Produit chargé
+
+UIStock -> Admin: Afficher formulaire pré-rempli
+Admin -> UIStock: Modifier données
+UIStock -> UIStock: Validation modifications
+
+alt Modifications valides
+    alt Images modifiées
+        UIStock -> SupabaseService: uploadNewImages(nouvellesImages)
+        SupabaseService -> Storage: Upload nouvelles images
+        Storage -> SupabaseService: Nouvelles URLs
+        SupabaseService -> UIStock: Nouvelles URLs reçues
+    end
+
+    UIStock -> SupabaseService: updateProduit(produitModifié)
+    SupabaseService -> DB: UPDATE produit
+    DB -> SupabaseService: Mise à jour effectuée
+    SupabaseService -> ProductProvider: Actualiser cache
+    ProductProvider -> UIStock: Cache rafraîchi
+
+    SupabaseService -> UIStock: Produit mis à jour
+    UIStock -> Admin: Confirmation mise à jour
+
+else Modifications invalides
+    UIStock -> Admin: Erreurs validation
+end
+
+== Suppression Produit ==
+
+Admin -> UIStock: Demander suppression produit
+UIStock -> Admin: Confirmer suppression dangereuse
+
+Admin -> UIStock: Confirmer suppression
+UIStock -> SupabaseService: deleteProduit(id)
+SupabaseService -> DB: SELECT images produit (avant suppression)
+DB -> SupabaseService: Détails images
+SupabaseService -> Storage: remove(imagesToDelete)
+Storage -> SupabaseService: Images supprimées
+SupabaseService -> DB: DELETE produit
+DB -> SupabaseService: Produit supprimé
+SupabaseService -> ProductProvider: Supprimer du cache
+ProductProvider -> UIStock: Cache actualisé
+
+SupabaseService -> UIStock: Produit supprimé définitivement
+UIStock -> Admin: Confirmation suppression
+
+== Surveillance Stock ==
+
+loop Surveillance continue
+    SupabaseService -> DB: Vérifier niveaux stock
+    DB -> SupabaseService: Produits avec stock faible
+
+    alt Produits en rupture
+        SupabaseService -> NotifService: creerNotificationStock(id, nom, stock)
+        NotifService -> DB: INSERT notification stock critique
+        NotifService -> Admin: Notification push stock faible
+    end
+end
+
+== Réapprovisionnement ==
+
+Admin -> UIStock: Recevoir livraison marchandise
+UIStock -> Admin: Saisir quantités reçues
+
+loop Pour chaque produit reçu
+    UIStock -> SupabaseService: calculerNouvellesQuantites()
+    SupabaseService -> DB: UPDATE quantites stock
+    DB -> SupabaseService: Stock mis à jour
+    SupabaseService -> UIStock: Quantités actualisées
+end
+
+SupabaseService -> NotifService: stockRestabiliseNotification()
+NotifService -> Admin: Confirmation réapprovisionnement
+
+== Export Inventaire ==
+
+Admin -> UIStock: Demander export inventaire
+UIStock -> SupabaseService: getAllProduits()
+SupabaseService -> DB: SELECT tous produits
+DB -> SupabaseService: Liste complète produits
+SupabaseService -> UIStock: Données produits
+
+UIStock -> UIStock: Générer fichier Excel/CSV
+UIStock -> Admin: Télécharger fichier inventaire
+
+note right
+    **Types de produits :**
+    - Bureautique (bucket: imagesbureautique)
+    - Réseau (bucket: imagesreseau)
+    - Accessoires (bucket: imageaccessoires)
+    - Mobile (bucket: imageappareilmobile)
+    - Autres (bucket: imagesproduits)
+
+    **Règles de nommage IDs :**
+    - Type + numéro à 3 chiffres
+    - Ex: BUREAUTIQUE001, RESEAU023
+
+    **Seuils d'alerte stock :**
+    - Critique : ≤ 5 unités
+    - Faible : ≤ 10 unités
+    - Normal : > 10 unités
+end note
+
+@enduml

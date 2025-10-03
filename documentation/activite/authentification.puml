@@ -1,0 +1,105 @@
+@startuml Activité - Gestion Authentification
+!theme vibrant
+
+title Gestion Authentification et Utilisateurs
+
+start
+
+:Ouverture application;
+
+if (Utilisateur connecté ?) then (Oui)
+    :Récupérer session utilisateur;
+    :Vérifier rôle utilisateur;
+
+    if (Rôle admin ?) then (Oui)
+        :Afficher interface admin;
+    else if (Rôle livreur ?) then (Oui)
+        :Afficher interface livreur;
+    else if (Rôle commercial ?) then (Oui)
+        :Afficher interface commercial;
+    else (Client)
+        :Afficher interface client;
+    endif
+else (Non)
+    :Afficher écran démarrage;
+    :Rediriger vers defaut;
+endif
+
+
+partition "Processus Inscription" {
+    :Cliquer sur "S'inscrire";
+    :Saisir données personnelles;
+
+    if (Données valides ?) then (Oui)
+        :Vérifier email unique;
+        if (Email disponible ?) then (Oui)
+            :Créer compte utilisateur;
+            :Notifier inscription réussie;
+        else (Non)
+            :Notifier email déjà utilisé;
+        endif
+    else (Non)
+        :Afficher erreurs validation;
+        note right
+            Erreurs possibles :
+            - Email invalide
+            - Mot de passe trop faible
+            - Champs obligatoires vides
+        end note
+    endif
+}
+
+partition "Processus Connexion" {
+    :Cliquer sur "Se connecter";
+    :Saisir email/mot de passe;
+
+    if (Données saisies ?) then (Oui)
+        :Vérifier dans base données;
+        if (Connexion valide ?) then (Oui)
+            :Créer session utilisateur;
+            :Rediriger selon rôle;
+
+            if (Admin connecté ?) then (Oui)
+                :Charger interface admin;
+            else if (Livreur connecté ?) then (Oui)
+                :Charger interface livreur;
+            else if (Commercial connecté ?) then (Oui)
+                :Charger interface commercial;
+            else (Client)
+                :Charger interface client;
+            endif
+
+        else (Non)
+            if (Email existe ?) then (Oui)
+                :Notifier mot de passe incorrect;
+            else (Non)
+                :Notifier email inconnu;
+            endif
+        endif
+    else (Non)
+        :Notifier champs obligatoires;
+    endif
+}
+
+
+
+:Demande déconnexion;
+:Détruire session;
+:Rediriger vers connexion;
+
+stop
+
+note right
+    **Système de rôles :**
+    - Client : achat, panier, commandes
+    - Admin : gestion totale plateforme
+    - Livreur : livraison commandes
+    - Commercial : support client
+
+    **Sécurité :**
+    - Sessions sécurisées
+    - Permissions par rôle
+    - Audit des actions
+end note
+
+@enduml

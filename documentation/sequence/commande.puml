@@ -1,0 +1,95 @@
+@startuml Séquence - Processus de Commande
+!theme vibrant
+
+title Processus de Commande - Acheter un produit
+
+actor "Client" as Client
+participant "Interface\nPanier" as PanierUI
+participant "PanierProvider" as PanierProvider
+participant "SupabaseService" as SupabaseService
+participant "Base de Données" as DB
+participant "Interface\nPaiement" as PaiementUI
+participant "CinetPay\n(Paiement)" as CinetPay
+participant "Admin" as Admin
+participant "Livreur" as Livreur
+participant "NotificationService" as NotifService
+
+== Phase 1: Ajout au panier ==
+Client -> PanierUI: Ajouter produit au panier
+PanierUI -> PanierProvider: ajouterAuPanier(produitId, quantite)
+PanierProvider -> DB: INSERT panier
+PanierProvider -> Client: Confirmation ajout
+
+== Phase 2: Validation de la commande ==
+Client -> PanierUI: Aller à la validation commande
+PanierUI -> Client: Afficher formulaire commande
+Client -> PanaierUI: Saisir infos livraison + paiement
+PanierUI -> SupabaseService: addCommande(commandeData)
+SupabaseService -> DB: INSERT commandes
+SupabaseService -> NotifService: creerNotificationCommande()
+NotifService -> DB: INSERT notification
+SupabaseService -> PanierUI: Commande créée
+PanierUI -> Client: Redirection vers paiement
+
+== Phase 3: Paiement ==
+alt Paiement électronique
+    Client -> PaiementUI: Procéder au paiement
+    PaiementUI -> CinetPay: initierPaiement(montant, infos)
+    CinetPay -> PaiementUI: URL paiement
+    Client -> CinetPay: Saisie données bancaires
+    CinetPay -> PaiementUI: Confirmation paiement
+    PaiementUI -> SupabaseService: updateCommandePaiement(status=Payé)
+    SupabaseService -> DB: UPDATE statut paiement
+    SupabaseService -> NotifService: creerNotificationPaiement()
+else Paiement à la livraison
+    SupabaseService -> DB: UPDATE statut paiement = "En attente"
+end
+
+== Phase 4: Validation administrateur (paiement CASH) ==
+note right: Seulement pour paiement à la livraison
+Admin -> Admin: Validation commande CASH
+Admin -> SupabaseService: majStatut(commandeId, "Validée")
+SupabaseService -> DB: UPDATE statut paiement
+SupabaseService -> NotifService: Notification client validation
+NotifService -> DB: INSERT notification
+
+== Phase 5: Attribution au livreur ==
+Admin -> Admin: Sélection livreur disponible
+Admin -> SupabaseService: assignLivreur(commandeId, livreurId)
+SupabaseService -> DB: UPDATE idlivreur + statut="En livraison"
+SupabaseService -> NotifService: creerNotificationLivraison(livreur)
+NotifService -> DB: INSERT notification livreur
+SupabaseService -> Client: Notification livraison
+PanierUI -> Client: Affichage progression livraison
+
+== Phase 6: Livraison ==
+Livreur -> Livreur: Prise en charge livraison
+Livreur -> SupabaseService: majStatut(commandeId, "Livré")
+SupabaseService -> DB: UPDATE statut
+SupabaseService -> NotifService: Notification livraison terminée
+NotifService -> DB: INSERT notification client
+
+== Phase 7: Finalisation ==
+Client -> Client: Confirmation réception
+alt Confirmation immédiate
+    Client -> SupabaseService: majStatut(commandeId, "Terminé")
+    SupabaseService -> DB: UPDATE statut
+    SupabaseService -> DB: decrementStockForOrder()
+else Confirmation différée
+    note right: Système ferme automatiquement après délai
+end
+
+== Phase 8: Facturation ==
+SupabaseService -> SupabaseService: generateInvoiceForOrder()
+SupabaseService -> DB: INSERT facture
+
+note right
+    **Etats possibles de commande:**
+    En attente → Validée → En livraison → Livré → Terminé
+
+    **Méthodes paiement:**
+    - Electronique (CinetPay)
+    - Cash à la livraison
+end note
+
+@enduml
