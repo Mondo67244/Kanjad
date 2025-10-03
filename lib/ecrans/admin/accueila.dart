@@ -56,7 +56,6 @@ class _AccueilaState extends State<Accueila> {
           ),
           child: CustomScrollView(
             slivers: [
-              
               SliverPadding(
                 padding: const EdgeInsets.all(16.0),
                 sliver: _construireGrilleActions(),

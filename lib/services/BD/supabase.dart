@@ -81,7 +81,7 @@ class SupabaseService {
       case 'appareil mobile':
         return 'imageappareilmobile';
       default:
-        return 'imagesproduits'; 
+        return 'imagesproduits';
     }
   }
 
@@ -200,7 +200,7 @@ class SupabaseService {
           'Tentative de récupération des produits frais depuis Supabase.',
           name: 'SupabaseService.getProduits',
         );
-        return await _fetchAndCacheProducts(prefs, now);
+        return await recupEtCache(prefs, now);
       } on SocketException catch (e) {
         // Si la récupération échoue à cause d'une erreur réseau, on se rabat sur le cache s'il existe.
         developer.log(
@@ -281,7 +281,7 @@ class SupabaseService {
     return [];
   }
 
-  Future<List<Produit>> _fetchAndCacheProducts(
+  Future<List<Produit>> recupEtCache(
     SharedPreferences prefs,
     int timestamp,
   ) async {
@@ -302,23 +302,23 @@ class SupabaseService {
       }).toList();
     } on SocketException catch (e, stackTrace) {
       developer.log(
-        'Network error in _fetchAndCacheProducts: $e',
+        'Network error in recupEtCache: $e',
         name: 'SupabaseService.getProduits',
         error: e,
         stackTrace: stackTrace,
       );
-      print('Erreur réseau dans _fetchAndCacheProducts: $e');
+      print('Erreur réseau dans recupEtCache: $e');
       print('Stack trace: $stackTrace');
       // Rethrow network exceptions to be handled by the calling function
       rethrow;
     } catch (e, stackTrace) {
       developer.log(
-        'Error in _fetchAndCacheProducts: $e',
+        'Error in recupEtCache: $e',
         name: 'SupabaseService.getProduits',
         error: e,
         stackTrace: stackTrace,
       );
-      print('Erreur dans _fetchAndCacheProducts: $e');
+      print('Erreur dans recupEtCache: $e');
       print('Stack trace: $stackTrace');
       rethrow;
     }
@@ -489,15 +489,15 @@ class SupabaseService {
       );
 
       // 1. Get product details to find image files
-      final produitData = await supabase
-          .from(produitsTable)
-          .select('categorie, img1, img2, img3')
-          .eq('idproduit', produitId)
-          .maybeSingle();
+      final produitData =
+          await supabase
+              .from(produitsTable)
+              .select('categorie, img1, img2, img3')
+              .eq('idproduit', produitId)
+              .maybeSingle();
 
-      
       await supabase.from(produitsTable).delete().eq('idproduit', produitId);
-      
+
       developer.log(
         'Successfully deleted product record for ID: $produitId.',
         name: 'SupabaseService.deleteProduit',
@@ -506,33 +506,38 @@ class SupabaseService {
       if (produitData != null) {
         final categorie = produitData['categorie'] as String?;
         if (categorie == null || categorie.isEmpty) {
-            developer.log('Category is null or empty, cannot determine bucket for image deletion.', name: 'SupabaseService.deleteProduit');
+          developer.log(
+            'Category is null or empty, cannot determine bucket for image deletion.',
+            name: 'SupabaseService.deleteProduit',
+          );
         } else {
-            final bucketName = getBucketName(categorie);
-            
-            final List<String> imagesToDelete = [];
-            final img1 = produitData['img1'] as String?;
-            final img2 = produitData['img2'] as String?;
-            final img3 = produitData['img3'] as String?;
+          final bucketName = getBucketName(categorie);
 
-            if (img1 != null && img1.isNotEmpty) imagesToDelete.add(img1);
-            if (img2 != null && img2.isNotEmpty) imagesToDelete.add(img2);
-            if (img3 != null && img3.isNotEmpty) imagesToDelete.add(img3);
+          final List<String> imagesToDelete = [];
+          final img1 = produitData['img1'] as String?;
+          final img2 = produitData['img2'] as String?;
+          final img3 = produitData['img3'] as String?;
 
-            // 3. Delete images from storage if any
-            if (imagesToDelete.isNotEmpty) {
-              // The file names might be full URLs. We need to extract the path.
-              final fileNames = imagesToDelete.map((url) => path.basename(Uri.parse(url).path)).toList();
-              
-              developer.log(
-                'Deleting images from bucket $bucketName: $fileNames',
-                name: 'SupabaseService.deleteProduit',
-              );
-              await supabase.storage.from(bucketName).remove(fileNames);
-            }
+          if (img1 != null && img1.isNotEmpty) imagesToDelete.add(img1);
+          if (img2 != null && img2.isNotEmpty) imagesToDelete.add(img2);
+          if (img3 != null && img3.isNotEmpty) imagesToDelete.add(img3);
+
+          // 3. Delete images from storage if any
+          if (imagesToDelete.isNotEmpty) {
+            // The file names might be full URLs. We need to extract the path.
+            final fileNames =
+                imagesToDelete
+                    .map((url) => path.basename(Uri.parse(url).path))
+                    .toList();
+
+            developer.log(
+              'Deleting images from bucket $bucketName: $fileNames',
+              name: 'SupabaseService.deleteProduit',
+            );
+            await supabase.storage.from(bucketName).remove(fileNames);
+          }
         }
       }
-
     } catch (e, stackTrace) {
       developer.log(
         'Error in deleteProduit: $e',
@@ -662,14 +667,13 @@ class SupabaseService {
   //       name: 'SupabaseService.deleteUser',
   //     );
 
-     
   //     final response = await supabase.functions.invoke('delete-user', body: {'user_id': userId});
 
   //     if (response.status != 200) {
   //       final errorData = response.data as Map<String, dynamic>?;
   //       throw Exception('Failed to delete user: ${errorData?['error'] ?? 'Unknown error'}');
   //     }
-      
+
   //     developer.log(
   //       'Successfully invoked edge function to delete user with ID: $userId',
   //       name: 'SupabaseService.deleteUser',
@@ -687,7 +691,6 @@ class SupabaseService {
   //   }
   // }
 
-
   //Debut commande
   Future<void> updateCommandePaiement(
     String commandeId,
@@ -700,18 +703,20 @@ class SupabaseService {
         'Updating commande payment for ID: $commandeId',
         name: 'SupabaseService.updateCommandePaiement',
       );
-      
+
       // Mise à jour de la commande
-      final response = await supabase
-          .from(commandesTable)
-          .update({
-            'statutpaiement': status,
-            'methodepaiement': methodePaiement,
-            'numeropaiement': numeroPaiement.isEmpty ? null : numeroPaiement,
-          })
-          .eq('idcommande', commandeId)
-          .select()
-          .single();
+      final response =
+          await supabase
+              .from(commandesTable)
+              .update({
+                'statutpaiement': status,
+                'methodepaiement': methodePaiement,
+                'numeropaiement':
+                    numeroPaiement.isEmpty ? null : numeroPaiement,
+              })
+              .eq('idcommande', commandeId)
+              .select()
+              .single();
 
       // Si le statut est "Payé", créer une notification
       if (status == 'Payé') {
@@ -903,8 +908,13 @@ class SupabaseService {
         'Adding commande: ${commande.idcommande}',
         name: 'SupabaseService.addCommande',
       );
-      
-      final result = await supabase.from(commandesTable).insert(commande.toMap()).select().single();
+
+      final result =
+          await supabase
+              .from(commandesTable)
+              .insert(commande.toMap())
+              .select()
+              .single();
       final idcommande = result['idcommande'] as String;
 
       // Créer une notification pour la nouvelle commande
@@ -912,7 +922,7 @@ class SupabaseService {
         idcommande,
         commande.utilisateur.idutilisateur,
       );
-      
+
       developer.log(
         'Successfully added commande: ${commande.idcommande}',
         name: 'SupabaseService.addCommande',
@@ -1619,11 +1629,12 @@ class SupabaseService {
   Future<void> majStatut(String commandeId, String newStatus) async {
     try {
       // Récupérer les détails de la commande avant la mise à jour
-      final response = await supabase
-          .from(commandesTable)
-          .select()
-          .eq('idcommande', commandeId)
-          .single();
+      final response =
+          await supabase
+              .from(commandesTable)
+              .select()
+              .eq('idcommande', commandeId)
+              .single();
 
       // Mise à jour du statut
       await supabase
@@ -1793,10 +1804,10 @@ class SupabaseService {
         commandeId,
         idlivreur,
       );
-      
+
       developer.log(
         'Successfully assigned livreur and created notification',
-        name: 'SupabaseService.assignLivreur', 
+        name: 'SupabaseService.assignLivreur',
       );
     } catch (e, stackTrace) {
       developer.log(
@@ -1930,27 +1941,28 @@ class SupabaseService {
         final String nomProduit = produitInCommande['nomproduit'];
 
         // Récupérer la quantité actuelle avant la mise à jour
-        final response = await supabase
-            .from(produitsTable)
-            .select('quantite')
-            .eq('idproduit', produitId)
-            .single();
-            
+        final response =
+            await supabase
+                .from(produitsTable)
+                .select('quantite')
+                .eq('idproduit', produitId)
+                .single();
+
         final int quantiteActuelle = (response['quantite'] as num).toInt();
         final int nouvelleQuantite = quantiteActuelle - quantiteVendue;
 
         // Appel d'une fonction RPC sur Supabase pour décrémenter la quantité
-        await supabase.rpc('decrement_product_quantity', params: {
-          'product_id_in': produitId,
-          'quantity_in': quantiteVendue,
-        });
+        await supabase.rpc(
+          'decrement_product_quantity',
+          params: {'product_id_in': produitId, 'quantity_in': quantiteVendue},
+        );
 
         // Créer une notification si le stock est bas
         if (nouvelleQuantite <= 5) {
           await NotificationService.instance.creerNotificationStock(
-            produitId, 
+            produitId,
             nomProduit,
-            nouvelleQuantite
+            nouvelleQuantite,
           );
         }
       }
@@ -1969,4 +1981,3 @@ class SupabaseService {
     }
   }
 }
-
