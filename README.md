@@ -92,7 +92,3 @@ If you encounter a bug or have a suggestion:
 
 ## 📄 License
 This application is proprietary. All rights are strictly reserved.
-
-## 📄 License
-
-This application is proprietary. All rights reserved.
