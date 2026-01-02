@@ -34,7 +34,7 @@ La dernière version de l'APK est disponible dans les [Releases GitHub](https://
 
 ## 🌐 Versions Disponibles
 
-- **Version actuelle** : 1.7.3 (interne)
+- **Version actuelle** : 1.8
 - Consultez l'historique complet dans l'onglet [Releases](https://github.com/Mondo67244/Kanjad/releases/latest).
 
 ## 🛠️ Comment Contribuer ou Signaler un Problème
@@ -82,7 +82,7 @@ The latest APK version is available in the [GitHub Releases](https://github.com/
 ⚠️ **Warning**: Only install from this official source to avoid security risks.
 
 ## 🌐 Available Versions
-- **Current Version**: 1.7.3 (internal)
+- **Current Version**: 1.8
 - View the full history in the [Releases](https://github.com/Mondo67244/Kanjad/releases) tab.
 
 ## 🛠️ How to Contribute or Report an Issue
