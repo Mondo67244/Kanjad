@@ -1,7 +1,7 @@
 # Kanjad E-commerce
 Votre E-commerce de confiance au Cameroun et partout ailleurs
 
-[![Version](https://img.shields.io/badge/Version-1.8-green)](https://github.com/Mondo67244/Kanjad/releases/latest)
+[![Version](https://img.shields.io/badge/Version-v1.8-blue)](https://github.com/Mondo67244/Kanjad/releases/latest)
 [![Android](https://img.shields.io/badge/Platform-Android-red)](https://www.android.com)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](LICENSE)
 
