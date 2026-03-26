@@ -1,7 +1,7 @@
-# Kanjad E-commerce
+# Kanjad E-commerce v2.0
 Votre E-commerce de confiance au Cameroun et partout ailleurs
 
-[![Version](https://img.shields.io/badge/Version-v1.8-blue)](https://github.com/Mondo67244/Kanjad/releases/latest)
+[![Version](https://img.shields.io/badge/Version-v2.0-green)](https://github.com/LambertMondo/Kanjad/releases/latest)
 [![Android](https://img.shields.io/badge/Platform-Android-red)](https://www.android.com)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](LICENSE)
 
@@ -21,7 +21,7 @@ Ce repo sert principalement à héberger les fichiers APK pour une installation 
 
 ## 📲 Téléchargement de l'APK
 
-La dernière version de l'APK est disponible dans les [Releases GitHub](https://github.com/Mondo67244/Kanjad/releases/latest)
+La dernière version de l'APK est disponible dans les [Releases GitHub](https://github.com/LambertMondo/Kanjad/releases/latest)
 
 **Étapes d'installation :**
 1. Téléchargez le fichier `.apk` depuis la release la plus récente.
@@ -34,13 +34,13 @@ La dernière version de l'APK est disponible dans les [Releases GitHub](https://
 
 ## 🌐 Versions Disponibles
 
-- **Version actuelle** : 1.8
-- Consultez l'historique complet dans l'onglet [Releases](https://github.com/Mondo67244/Kanjad/releases/latest).
+- **Version actuelle** : 2.0
+- Consultez l'historique complet dans l'onglet [Releases](https://github.com/LambertMondo/Kanjad/releases/latest).
 
 ## 🛠️ Comment Contribuer ou Signaler un Problème
 
 Si vous rencontrez un bug ou avez une suggestion :
-- Ouvrez une [Issue](https://github.com/Mondo67244/Kanjad/releases/issues/new).
+- Ouvrez une [Issue](https://github.com/LambertMondo/Kanjad/releases/issues/new).
 
 ## 📄 Licence
 
@@ -52,7 +52,7 @@ Cette application est propriétaire. Tous droits nous sont strictement réservé
 Your Trusted E-commerce in Cameroon and Beyond
 
 # Kanjad E-commerce
-[![Version](https://img.shields.io/badge/Version-v1.8-blue)](https://github.com/Mondo67244/Kanjad/releases/latest)
+[![Version](https://img.shields.io/badge/Version-v2.0-green)](https://github.com/LambertMondo/Kanjad/releases/latest)
 [![Android](https://img.shields.io/badge/Platform-Android-red)](https://www.android.com)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](LICENSE)
 
@@ -70,7 +70,7 @@ This repo is primarily used to host APK files for direct installation, as a comp
 - **Multilingual**: Interface available in **French** and **English**.
 
 ## 📲 APK Download
-The latest APK version is available in the [GitHub Releases](https://github.com/Mondo67244/Kanjad/releases/latest).
+The latest APK version is available in the [GitHub Releases](https://github.com/LambertMondo/Kanjad/releases/latest).
 
 **Installation Steps:**
 1. Download the `.apk` file from the most recent release.
@@ -82,12 +82,12 @@ The latest APK version is available in the [GitHub Releases](https://github.com/
 ⚠️ **Warning**: Only install from this official source to avoid security risks.
 
 ## 🌐 Available Versions
-- **Current Version**: 1.8
-- View the full history in the [Releases](https://github.com/Mondo67244/Kanjad/releases) tab.
+- **Current Version**: 2.0
+- View the full history in the [Releases](https://github.com/LambertMondo/Kanjad/releases) tab.
 
 ## 🛠️ How to Contribute or Report an Issue
 If you encounter a bug or have a suggestion:
-- Open an [Issue](https://github.com/Mondo67244/Kanjad/issues/new).
+- Open an [Issue](https://github.com/LambertMondo/Kanjad/issues/new).
 
 ## 📄 License
 This application is proprietary. All rights are strictly reserved.
